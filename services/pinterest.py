@@ -1,5 +1,7 @@
+import os
 import requests
 
+from fixtures.recipe_samples import RECIPE_SAMPLES
 
 base_url = 'https://api.pinterest.com/v1'
 
@@ -38,6 +40,10 @@ def filter_recipes_only(pins):
 
 
 def get_batch_of_recipes(oauth_token, cursor, query):
+    if not os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
+        # dont actually call pinterest in dev because they rate limit us
+        return {'data': RECIPE_SAMPLES, 'cursor': ''}
+
     pins = []
     while len(pins) < 25:
         pinterest_response = get_pins_from_pinterest(oauth_token, cursor, query)
