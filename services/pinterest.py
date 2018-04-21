@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 base_url = 'https://api.pinterest.com/v1'
@@ -45,5 +46,7 @@ def get_batch_of_recipes(oauth_token, cursor, query):
         cursor = pinterest_response['page']['cursor']
         print cursor
         if not cursor:
+            print json.dumps(pins, sort_keys=True, indent=4, separators=(',', ': '))
             return {'data': pins, 'cursor': cursor}
+    print json.dumps(pins, sort_keys=True, indent=4, separators=(',', ': '))
     return {'data': pins, 'cursor': cursor}
