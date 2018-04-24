@@ -1,7 +1,10 @@
-from flask import Flask, request, abort
-from services.pinterest import get_batch_of_recipes
-from flask import jsonify
 import requests_toolbelt.adapters.appengine
+from flask import Flask, jsonify, request
+
+from decorators.request import authorize
+from models.user import User
+from services.pinterest import get_batch_of_recipes
+
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
 # URLFetch.
@@ -9,18 +12,16 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 app = Flask(__name__)
 
 
-def authorize(func):
-    def authorized_func():
-        oauth_token = request.headers.get('oauth_token')
-        if not oauth_token:
-            abort(401)
-        return func(oauth_token)
-    return authorized_func
-
-
 @app.route('/recipes')
-@authorize
+@authorize(token_only=True)
 def get_recipe_pins(oauth_token):
     cursor = request.args.get('cursor')
     query = request.args.get('query')
     return jsonify(get_batch_of_recipes(oauth_token, cursor, query))
+
+
+@app.route('/users/<user_id>')
+@authorize(token_only=True)
+def create_user(_, user_id):
+    User(id=user_id).put()
+    return jsonify({})
