@@ -4,7 +4,6 @@ from flask import Flask, jsonify, request
 from decorators.request import authorize
 from models.user import User
 from services.pinterest import get_batch_of_recipes
-from google.appengine.ext import ndb
 
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
