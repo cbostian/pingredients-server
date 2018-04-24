@@ -12,13 +12,6 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 app = Flask(__name__)
 
 
-@app.errorhandler(500)
-def internal_error(error):
-
-    print "500!!!" + error.message
-    return jsonify({'whatev': True})
-
-
 @app.route('/recipes')
 @authorize(token_only=True)
 def get_recipe_pins(oauth_token):
