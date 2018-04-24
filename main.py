@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from decorators.request import authorize
 from models.user import User
 from services.pinterest import get_batch_of_recipes
+from google.appengine.ext import ndb
 
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
@@ -29,6 +30,6 @@ def get_recipe_pins(oauth_token):
 
 @app.route('/users/<user_id>')
 @authorize(token_only=True)
-def create_user(oauth_token, user_id):
-    User(id=user_id)
+def create_user(_, user_id):
+    User(id=user_id).put()
     return jsonify({})
