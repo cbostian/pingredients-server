@@ -20,7 +20,7 @@ def get_recipe_pins(oauth_token):
     return jsonify(get_batch_of_recipes(oauth_token, cursor, query))
 
 
-@app.route('/users/<user_id>')
+@app.route('/users/<user_id>', methods=['PUT'])
 @authorize(token_only=True)
 def create_user(_, user_id):
     User(id=user_id).put()
