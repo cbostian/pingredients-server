@@ -12,8 +12,13 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 app = Flask(__name__)
 
 
+@app.errorhandler(500)
+def internal_error(error):
+    print error.message
+
+
 @app.route('/recipes')
-@authorize(token_only=True)
+@authorize()
 def get_recipe_pins(oauth_token):
     cursor = request.args.get('cursor')
     query = request.args.get('query')
