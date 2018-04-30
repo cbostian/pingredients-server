@@ -1,6 +1,7 @@
 import os
 import requests
 
+from copy import deepcopy
 from fixtures.recipe_samples import RECIPE_SAMPLES
 
 
@@ -32,18 +33,33 @@ def get_pins_from_pinterest(oauth_token, cursor, query):
     return response.json()
 
 
+def transform_ingredients(pin):
+    ingredients_dict = {}
+    recipe = pin['metadata']['recipe']
+
+    if not recipe.get('ingredients', []):
+        return pin
+
+    for ingredients in recipe['ingredients']:
+        for ingredient in ingredients.get('ingredients', []):
+            ingredients_dict.setdefault(ingredients['category'], []).append(ingredient)
+
+    recipe['ingredients'] = ingredients_dict
+    return pin
+
+
 def filter_recipes_only(pins):
     recipes = []
     for pin in pins:
         if pin.get('metadata', {}).get('recipe'):
-            recipes.append(pin)
+            recipes.append(transform_ingredients(pin))
     return recipes
 
 
 def get_batch_of_recipes(oauth_token, cursor, query):
     if not os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
         # dont actually call pinterest in dev because they rate limit us
-        return {'data': RECIPE_SAMPLES, 'cursor': ''}
+        return {'data': [transform_ingredients(recipe) for recipe in deepcopy(RECIPE_SAMPLES)], 'cursor': ''}
 
     pins = []
     while len(pins) < 25:
