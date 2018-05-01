@@ -56,14 +56,13 @@ def transform_servings(pin):
 
     if servings.get('serves'):
         if servings.get('serves').find('-') > -1:
-            average = sum(map(float, servings.get('serves').split('-')))/2
-            pin['metadata']['recipe']['servings'] = {'serves': average}
+            pin['metadata']['recipe']['servings'] = {'serves': sum(map(float, servings.get('serves').split('-')))/2}
         else:
-            pin['metadata']['recipe']['servings'] = {'serves': servings.get('serves', '')}
+            pin['metadata']['recipe']['servings'] = {'serves': float(servings.get('serves', ''))}
 
         return pin
 
-    yields = int(''.join(filter(str.isdigit, servings.get('yields'))))
+    yields = float(''.join(filter(str.isdigit, servings.get('yields'))))
     yield_units = ''.join(filter(lambda x: str.isalpha(x) or str.isspace(x),
                                  servings.get('summary'))).replace('Makes', '').strip()
 
