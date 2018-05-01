@@ -43,6 +43,7 @@ class Board(ndb.Model):
 
 
 class ActiveRecipe(ndb.Model):
+    id = ndb.StringProperty()
     note = ndb.StringProperty()
     image = ndb.StructuredProperty(Image)
     original_link = ndb.StringProperty()
