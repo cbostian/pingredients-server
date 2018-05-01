@@ -6,7 +6,6 @@ from decorators.request import authorize
 from models.active_recipe import ActiveRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
-import json
 
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
