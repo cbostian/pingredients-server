@@ -42,7 +42,7 @@ class Board(ndb.Model):
     name = ndb.StringProperty()
 
 
-class ActiveRecipe(ndb.Model):
+class MakingRecipe(ndb.Model):
     id = ndb.StringProperty()
     note = ndb.StringProperty()
     image = ndb.StructuredProperty(Image)
@@ -52,7 +52,7 @@ class ActiveRecipe(ndb.Model):
 
     @staticmethod
     def from_dict(recipe_dict):
-        return ActiveRecipe(
+        return MakingRecipe(
             id=recipe_dict['id'],
             note=recipe_dict.get('note', ''),
             image=Image(
