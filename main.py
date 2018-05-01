@@ -1,9 +1,15 @@
+import json
 import requests_toolbelt.adapters.appengine
 from flask import Flask, jsonify, request
+from google.appengine.ext import ndb
 
 from decorators.request import authorize
+from models.active_recipe import ActiveRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
+
+from fixtures.recipe_samples import RECIPE_SAMPLES
+from copy import deepcopy
 
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
@@ -19,7 +25,7 @@ def internal_error(error):
 
 @app.route('/recipes')
 @authorize()
-def get_recipe_pins(oauth_token):
+def get_recipe_pins(oauth_token, _):
     cursor = request.args.get('cursor')
     query = request.args.get('query')
     return jsonify(get_batch_of_recipes(oauth_token, cursor, query))
@@ -29,4 +35,13 @@ def get_recipe_pins(oauth_token):
 @authorize(token_only=True)
 def create_user(_, user_id):
     User(id=user_id).put()
+    return jsonify({})
+
+
+@app.route('/activate-recipe', methods=['POST'])
+@authorize()
+def activate_recipe(_, user_id):
+    user = ndb.Key(User, user_id).get()
+    user.active_recipes.append(ActiveRecipe.from_dict(request.get_json()))
+    user.put()
     return jsonify({})

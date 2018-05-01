@@ -8,6 +8,7 @@ from decorators.helpers import parametrized
 def authorize(func, token_only=False):
     @wraps(func)
     def authorized_func(*args, **kwargs):
+        user_id = ''
         oauth_token = request.headers.get('oauth_token')
         if not oauth_token:
             abort(401)
@@ -15,5 +16,6 @@ def authorize(func, token_only=False):
             user_id = request.headers.get('user_id')
             if not user_id:
                 abort(401)
+            return func(oauth_token, user_id, *args, **kwargs)
         return func(oauth_token, *args, **kwargs)
     return authorized_func
