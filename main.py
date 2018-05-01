@@ -1,4 +1,3 @@
-import json
 import requests_toolbelt.adapters.appengine
 from flask import Flask, jsonify, request
 from google.appengine.ext import ndb
@@ -7,9 +6,6 @@ from decorators.request import authorize
 from models.active_recipe import ActiveRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
-
-from fixtures.recipe_samples import RECIPE_SAMPLES
-from copy import deepcopy
 
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
