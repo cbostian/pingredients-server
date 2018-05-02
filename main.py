@@ -34,7 +34,7 @@ def create_user(_, user_id):
     return jsonify({})
 
 
-@app.route('/make-recipe', methods=['POST'])
+@app.route('/making-recipes', methods=['POST'])
 @authorize()
 def activate_recipe(_, user_id):
     user = ndb.Key(User, user_id).get()
@@ -47,6 +47,6 @@ def activate_recipe(_, user_id):
 @authorize()
 def deactivate_recipe(_, user_id, recipe_id):
     user = ndb.Key(User, user_id).get()
-    user.making_recipes = [i for i in user.making_recipes if i.id == recipe_id]
+    user.making_recipes = [recipe for recipe in user.making_recipes if recipe.id != recipe_id]
     user.put()
     return jsonify({})
