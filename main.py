@@ -36,8 +36,17 @@ def create_user(_, user_id):
 
 @app.route('/making-recipes', methods=['POST'])
 @authorize()
-def activate_recipe(_, user_id):
+def make_recipe(_, user_id):
     user = ndb.Key(User, user_id).get()
     user.making_recipes.append(MakingRecipe.from_dict(request.get_json()))
     user.put()
+    print request.get_json()
+    print '\n\n\n\n'
+    print MakingRecipe.from_dict(request.get_json()).to_dict()
     return jsonify({})
+
+
+@app.route('/making-recipes')
+@authorize()
+def get_making_recipes(_, user_id):
+    return jsonify(ndb.Key(User, user_id).get().to_dict().get('making_recipes', []))
