@@ -21,10 +21,10 @@ def internal_error(error):
 
 @app.route('/recipes')
 @authorize()
-def get_recipe_pins(oauth_token, _):
+def get_recipe_pins(oauth_token, user_id):
     cursor = request.args.get('cursor')
     query = request.args.get('query')
-    return jsonify(get_batch_of_recipes(oauth_token, cursor, query))
+    return jsonify(get_batch_of_recipes(oauth_token, cursor, query, ndb.Key(User, user_id).get().making_recipes))
 
 
 @app.route('/users/<user_id>', methods=['PUT'])
