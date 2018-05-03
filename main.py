@@ -21,10 +21,10 @@ def internal_error(error):
 
 @app.route('/recipes')
 @authorize()
-def get_recipe_pins(oauth_token, _):
+def get_recipe_pins(oauth_token, user_id):
     cursor = request.args.get('cursor')
     query = request.args.get('query')
-    return jsonify(get_batch_of_recipes(oauth_token, cursor, query))
+    return jsonify(get_batch_of_recipes(oauth_token, cursor, query, ndb.Key(User, user_id).get().making_recipes))
 
 
 @app.route('/users/<user_id>', methods=['PUT'])
@@ -48,3 +48,12 @@ def make_recipe(_, user_id):
 def get_making_recipes(_, user_id):
     print
     return jsonify(ndb.Key(User, user_id).get().to_dict().get('making_recipes', []))
+
+
+@app.route('/making-recipes/<recipe_id>', methods=['DELETE'])
+@authorize()
+def deactivate_recipe(_, user_id, recipe_id):
+    user = ndb.Key(User, user_id).get()
+    user.making_recipes = [recipe for recipe in user.making_recipes if recipe.id != recipe_id]
+    user.put()
+    return jsonify({})

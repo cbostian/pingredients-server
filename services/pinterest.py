@@ -71,24 +71,33 @@ def transform_servings(pin):
     return pin
 
 
-def transform(pin):
-    transform_servings(pin)
-    transform_ingredients(pin)
+def transform_making(pin, making_recipes):
+    pin['making'] = False
+    if any(recipe.id == pin['id'] for recipe in making_recipes):
+        pin['making'] = True
+
     return pin
 
 
-def filter_recipes_only(pins):
+def transform(pin, making_recipes):
+    transform_servings(pin)
+    transform_ingredients(pin)
+    transform_making(pin, making_recipes)
+    return pin
+
+
+def filter_recipes_only(pins, making_recipes):
     recipes = []
     for pin in pins:
         if pin.get('metadata', {}).get('recipe'):
-            recipes.append(transform(pin))
+            recipes.append(transform(pin, making_recipes))
     return recipes
 
 
-def get_batch_of_recipes(oauth_token, cursor, query):
+def get_batch_of_recipes(oauth_token, cursor, query, making_recipes):
     if not os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
         # dont actually call pinterest in dev because they rate limit us
-        return {'data': [transform(recipe) for recipe in deepcopy(RECIPE_SAMPLES)], 'cursor': ''}
+        return {'data': [transform(recipe, making_recipes) for recipe in deepcopy(RECIPE_SAMPLES)], 'cursor': ''}
 
     pins = []
     while len(pins) < 25:
