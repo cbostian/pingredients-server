@@ -11,7 +11,7 @@ base_url = 'https://api.pinterest.com/v1'
 def get_pins_from_pinterest(oauth_token, cursor, query):
     query_params = {
         'access_token': oauth_token,
-        'fields': 'id,note,metadata,image,media,attribution,board,original_link',
+        'fields': 'id,note,metadata,image,board,original_link',
         'limit': 100
     }
 

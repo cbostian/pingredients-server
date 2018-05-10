@@ -46,8 +46,7 @@ def make_recipe(_, user_id):
 @app.route('/making-recipes')
 @authorize()
 def get_making_recipes(_, user_id):
-    print
-    return jsonify(ndb.Key(User, user_id).get().to_dict().get('making_recipes', []))
+    return jsonify({'data': ndb.Key(User, user_id).get().to_dict().get('making_recipes', [])})
 
 
 @app.route('/making-recipes/<recipe_id>', methods=['DELETE'])
