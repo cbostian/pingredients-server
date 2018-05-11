@@ -49,6 +49,7 @@ class MakingRecipe(ndb.Model):
     original_link = ndb.StringProperty()
     metadata = ndb.StructuredProperty(Metadata)
     board = ndb.StructuredProperty(Board)
+    making = ndb.BooleanProperty()
 
     @staticmethod
     def from_dict(recipe_dict):
@@ -66,7 +67,7 @@ class MakingRecipe(ndb.Model):
             metadata=Metadata(
                 article=Article(
                     description=recipe_dict.get('metadata', {}).get('article', {}).get('description', ''),
-                    name=recipe_dict.get('metadata', {}).get('article', {}).get('description', '')
+                    name=recipe_dict.get('metadata', {}).get('article', {}).get('name', '')
                 ),
                 recipe=Recipe(
                     ingredients=recipe_dict.get('metadata', {}).get('recipe', {}).get('ingredients', {})
@@ -77,5 +78,6 @@ class MakingRecipe(ndb.Model):
                     yield_units=recipe_dict.get('metadata', {}).get('servings', {}).get('yield_units')
                 )
             ),
-            board=Board(name=recipe_dict.get('board', {}).get('name', ''))
+            board=Board(name=recipe_dict.get('board', {}).get('name', '')),
+            making=True
         )
