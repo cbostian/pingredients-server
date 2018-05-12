@@ -102,7 +102,7 @@ def get_batch_of_recipes(oauth_token, cursor, query, making_recipes):
     pins = []
     while len(pins) < 25:
         pinterest_response = get_pins_from_pinterest(oauth_token, cursor, query)
-        pins += filter_recipes_only(pinterest_response['data'])
+        pins += filter_recipes_only(pinterest_response['data'], making_recipes)
         cursor = pinterest_response['page']['cursor']
         if not cursor:
             return {'data': pins, 'cursor': cursor}
