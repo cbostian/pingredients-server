@@ -7,7 +7,6 @@ from models.making_recipe import MakingRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
 
-
 # Use the App Engine Requests adapter. This makes sure that Requests uses
 # URLFetch.
 requests_toolbelt.adapters.appengine.monkeypatch()
@@ -50,3 +49,9 @@ def deactivate_recipe(_, user_id, recipe_id):
     user.making_recipes = [recipe for recipe in user.making_recipes if recipe.id != recipe_id]
     user.put()
     return jsonify({})
+
+
+# @app.route('/ingredients')
+# @authorize()
+# def get_ingredients(_, user_id):
+#     return jsonify(transform_ingredients(user_id))
