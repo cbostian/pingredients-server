@@ -1,8 +1,11 @@
 import os
 import requests
+import unicodedata
 
 from copy import deepcopy
+from fractions import Fraction
 from fixtures.recipe_samples import RECIPE_SAMPLES
+from models.ingredient import Ingredient
 
 
 base_url = 'https://api.pinterest.com/v1'
@@ -48,29 +51,48 @@ def transform_ingredients(pin):
     return pin
 
 
+def transform_unicode_and_fractions(string):
+    try:
+        fraction = ''.join(
+            filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), string)).strip()
+        transformed_fraction = str(float(sum(Fraction(num) for num in fraction.split())))
+        string.replace(fraction, transformed_fraction)
+    except:
+        pass
+    try:
+        unicode_fraction = filter(
+            lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape'))
+        transformed_unicode = str(unicodedata.numeric(unicode_fraction))
+        string.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
+    except:
+        pass
+    return string
+
+
 def transform_ingredient(ingredient):
-    number_array = r"(\d{1,3}(?:\s*\d{3})*(?:,\d+)?)"
     amount = ingredient['amount']
     name = ingredient['name'].decode('unicode-escape')
-    transformed_amount = ''
-    transformed_unit = ''
-    if amount:
-        transformed_unit = ''.join(filter(lambda x: str.isalpha(x) or str.isspace(x), amount)).strip()
-        if '/' in amount:
-            transformed_amount = float(sum(Fraction(num) for num in (''.join(
-                filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), amount)).strip()).split()))
-        elif len(re.findall(number_array, amount)) > 1:
-            transformed_amount = int(re.findall(number_array, amount)[0]) * int(re.findall(number_array, amount)[1])
-            measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'cup', 'cups', 'tbsp']
-            transformed_unit = ''.join(filter(amount.split().__contains__, measurement_array))
-        else:
-            transformed_amount = float(''.join(filter(lambda x: str.isdigit(x), amount)).strip())
+    if amount.isdigit() and name.isalpha():
+        transformed_amount = amount
+        transformed_unit = ''
+        transformed_name = name
     else:
-        unicode_amount = filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), name)
-        if unicode_amount:
-            transformed_amount = unicodedata.numeric(unicode_amount)
+        measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'teaspoon', 'cup', 'dash', 'jar',
+                             'cups', 'tbsp', 'tablespoon', 'ml', 'g', 'head', 'heads', 'can', 'cans', 'cloves']
+        measure_list = filter(amount.split().__contains__, measurement_array)
+        if len(measure_list) == 1:
+            if amount[:amount.index(measure_list[0])].isdigit() and not amount[(
+                    amount.index(measure_list[0]) + len(measure_list[0])):]:
+                transformed_amount = amount[:amount.index(measure_list[0])]
+                transformed_unit = measure_list[0]
+                transformed_name = name
+        else:
+            measure_indices = dict()
+            for measure in measure_list:
+                measure_indices[measure] = measure_indices[measure].append(
+                    amount[:amount.index(measure)], amount[amount.index(measure) + len(measure):])
 
-    return Ingredient(name=name, amount=transformed_amount, unit=transformed_unit)
+    return Ingredient(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
 
 
 def transform_servings(pin):
