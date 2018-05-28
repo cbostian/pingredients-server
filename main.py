@@ -51,7 +51,7 @@ def get_making_recipes(_, user_id):
 
 @app.route('/making-recipes/<recipe_id>', methods=['DELETE'])
 @authorize()
-def deactivate_recipe(_, user_id, recipe_id):
+def unmake_recipe(_, user_id, recipe_id):
     user = ndb.Key(User, user_id).get()
     user.making_recipes = [recipe for recipe in user.making_recipes if recipe.id != recipe_id]
     user.put()

@@ -42,10 +42,35 @@ def transform_ingredients(pin):
 
     for ingredients in recipe['ingredients']:
         for ingredient in ingredients.get('ingredients', []):
-            ingredients_dict.setdefault(ingredients['category'], []).append(ingredient)
+            ingredients_dict.setdefault(ingredients['category'], []).append(transform_ingredient(ingredient).to_dict())
 
     recipe['ingredients'] = ingredients_dict
     return pin
+
+
+def transform_ingredient(ingredient):
+    number_array = r"(\d{1,3}(?:\s*\d{3})*(?:,\d+)?)"
+    amount = ingredient['amount']
+    name = ingredient['name'].decode('unicode-escape')
+    transformed_amount = ''
+    transformed_unit = ''
+    if amount:
+        transformed_unit = ''.join(filter(lambda x: str.isalpha(x) or str.isspace(x), amount)).strip()
+        if '/' in amount:
+            transformed_amount = float(sum(Fraction(num) for num in (''.join(
+                filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), amount)).strip()).split()))
+        elif len(re.findall(number_array, amount)) > 1:
+            transformed_amount = int(re.findall(number_array, amount)[0]) * int(re.findall(number_array, amount)[1])
+            measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'cup', 'cups', 'tbsp']
+            transformed_unit = ''.join(filter(amount.split().__contains__, measurement_array))
+        else:
+            transformed_amount = float(''.join(filter(lambda x: str.isdigit(x), amount)).strip())
+    else:
+        unicode_amount = filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), name)
+        if unicode_amount:
+            transformed_amount = unicodedata.numeric(unicode_amount)
+
+    return Ingredient(name=name, amount=transformed_amount, unit=transformed_unit)
 
 
 def transform_servings(pin):
