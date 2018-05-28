@@ -1,13 +1,9 @@
 import os
 import requests
-import re
-import unicodedata
-import ExplicitException
 
 from copy import deepcopy
 from fixtures.recipe_samples import RECIPE_SAMPLES
-from fractions import Fraction
-from models.ingredient import Ingredient
+
 
 base_url = 'https://api.pinterest.com/v1'
 
@@ -35,6 +31,21 @@ def get_pins_from_pinterest(oauth_token, cursor, query):
     response = requests.get(request_url, params=query_params)
 
     return response.json()
+
+
+def transform_ingredients(pin):
+    ingredients_dict = {}
+    recipe = pin['metadata']['recipe']
+
+    if not recipe.get('ingredients', []):
+        return pin
+
+    for ingredients in recipe['ingredients']:
+        for ingredient in ingredients.get('ingredients', []):
+            ingredients_dict.setdefault(ingredients['category'], []).append(ingredient)
+
+    recipe['ingredients'] = ingredients_dict
+    return pin
 
 
 def transform_servings(pin):
@@ -66,63 +77,6 @@ def transform_making(pin, making_recipes):
         pin['making'] = True
 
     return pin
-
-
-def transform_ingredients(pin):
-    ingredients_dict = {}
-    recipe = pin['metadata']['recipe']
-
-    if not recipe.get('ingredients', []):
-        return pin
-
-    for ingredients in recipe['ingredients']:
-        for ingredient in ingredients.get('ingredients', []):
-            amount, unit = transform_amount_and_units(ingredient['amount'])
-            ingredients_dict.setdefault(ingredients['category'], []).append(Ingredient(
-                name=ingredient['name'], amount=amount, unit=unit).to_dict())
-
-    recipe['ingredients'] = ingredients_dict
-    return pin
-
-
-def transform_unicode_and_fractions(string):
-    try:
-        fraction = ''.join(
-            filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), string)).strip()
-        transformed_fraction = str(float(sum(Fraction(num) for num in fraction.split())))
-        string.replace(fraction, transformed_fraction)
-    except ExplicitException:
-        pass
-    try:
-        unicode_fraction = filter(
-            lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape'))
-        transformed_unicode = str(unicodedata.numeric(unicode_fraction))
-        string.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
-    except ExplicitException:
-        pass
-    return string
-
-
-def transform_amount_and_units(amount, name):
-    if amount.isdigit() and name.isalpha():
-        transformed_amount = amount
-        transformed_unit = ''
-        transformed_name = name
-    else:
-        measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'teaspoon', 'cup', 'dash', 'jar',
-                             'cups', 'tbsp', 'tablespoon', 'ml', 'g', 'head', 'heads', 'can', 'cans', 'cloves']
-        measure_list = filter(amount.split().__contains__, measurement_array)
-        if len(measure_list) == 1:
-            if amount[:amount.index(measure_list[0])].isdigit() and not amount[(amount.index(measure_list[0]) + len(measure_list[0])):]:
-                transformed_amount = amount[:amount.index(measure_list[0])]
-                transformed_unit = measure_list[0]
-                transformed_name = name
-        else:
-            measure_indices = dict()
-            for measure in measure_list:
-                measure_indices[measure] = measure_indices[measure].append(amount[:amount.index(measure)], amount[amount.index(measure) + len(measure):])
-
-    return transformed_amount, transformed_unit, transformed_name
 
 
 def transform(pin, making_recipes):
