@@ -45,7 +45,7 @@ def transform_ingredients(pin):
 
     for ingredients in recipe['ingredients']:
         for ingredient in ingredients.get('ingredients', []):
-            ingredients_dict.setdefault(ingredients['category'], []).append(transform_ingredient(ingredient).to_dict())
+            ingredients_dict.setdefault(ingredients['category'], []).append(transform_ingredient(ingredient))
 
     recipe['ingredients'] = ingredients_dict
     return pin
@@ -70,8 +70,9 @@ def transform_unicode_and_fractions(string):
 
 
 def transform_ingredient(ingredient):
-    amount = ingredient['amount']
+    amount = ingredient['amount'] or ''
     name = ingredient['name'].decode('unicode-escape')
+    transformed_amount = transformed_unit = transformed_name = ''
     if amount.isdigit() and name.isalpha():
         transformed_amount = amount
         transformed_unit = ''
@@ -87,12 +88,13 @@ def transform_ingredient(ingredient):
                 transformed_unit = measure_list[0]
                 transformed_name = name
         else:
+            # JB: not sure what this code does, we add stuff to measure_indices but then measure_indices is never used
             measure_indices = dict()
             for measure in measure_list:
-                measure_indices[measure] = measure_indices[measure].append(
-                    amount[:amount.index(measure)], amount[amount.index(measure) + len(measure):])
+                measure_indices[measure] = measure_indices.setdefault(measure, []).append(
+                    amount[:amount.index(measure)] + amount[amount.index(measure) + len(measure):])
 
-    return Ingredient(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
+    return dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
 
 
 def transform_servings(pin):
