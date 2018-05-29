@@ -32,5 +32,5 @@ class Ingredient():
     def do_names_match(self, other):
         for self_valid_name in self.valid_names_sorted():
             for other_valid_name in other.valid_names_sorted():
-                if SequenceMatcher(None, self_valid_name,other_valid_name).ratio() > 0.7857142857142856:
+                if SequenceMatcher(None, self_valid_name, other_valid_name).ratio() > 0.7857142857142856:
                     return True

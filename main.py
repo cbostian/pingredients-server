@@ -7,6 +7,7 @@ from models.ingredient import Ingredient
 from models.making_recipe import MakingRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
+import json
 
 # Use the App Engine Requests adapter. This makes sure that Requests uses
 # URLFetch.
