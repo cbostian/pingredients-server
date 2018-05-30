@@ -18,7 +18,7 @@ class Ingredient():
 
     @staticmethod
     def from_dict(dict):
-        return Ingredient(name=dict.get('name', ''), amount=dict.get('amount', 0.0), unit=dict.get('unit', ''))
+        return Ingredient(name=dict.get('name', ''), amount=float(dict.get('amount', 0.0)), unit=dict.get('unit', ''))
 
     def valid_names_sorted(self):
         valid_names = [''.join(sorted(self.name.lower().split(' ')))]
