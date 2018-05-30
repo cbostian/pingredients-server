@@ -1,6 +1,7 @@
 import os
 import requests
 import unicodedata
+import re
 
 from copy import deepcopy
 from fractions import Fraction
@@ -53,21 +54,25 @@ def transform_ingredients(pin):
 
 #this function never gets called
 def transform_unicode_and_fractions(string):
-    try:
-        fraction = ''.join(
-            filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), string)).strip()
-        transformed_fraction = str(float(sum(Fraction(num) for num in fraction.split())))
-        string.replace(fraction, transformed_fraction)
-    except:
-        pass
-    try:
-        unicode_fraction = filter(
-            lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape'))
-        transformed_unicode = str(unicodedata.numeric(unicode_fraction))
-        string.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
-    except:
-        pass
+    if filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape')):
+        return convert_unicode(string)
+    if re.findall(r'^([0-9]([0-9])?\/[0-9]|[0-9]([0-9])?\s[0-9]\/[0-9]).*$', string):
+        return convert_fraction(string)
     return string
+
+
+def convert_fraction(string_to_convert):
+    fraction = ''.join(filter(lambda x: x.isdigit() or x == '/' or x.isspace(), string_to_convert)).strip()
+    transformed_fraction = repr(float(sum(Fraction(num) for num in fraction.split())))
+    new_string = string_to_convert.replace(fraction, transformed_fraction)
+    return new_string
+
+
+def convert_unicode(string_to_convert):
+    unicode_fraction = filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string_to_convert.decode('unicode-escape'))
+    transformed_unicode = repr(unicodedata.numeric(unicode_fraction))
+    new_string = string_to_convert.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
+    return new_string
 
 
 def transform_ingredient(ingredient):
@@ -80,7 +85,10 @@ def transform_ingredient(ingredient):
     transformed_amount = float((filter(lambda word: word.isdigit(), amount) or [0.0])[0])
     transformed_unit = derive_unit(string_with_unit)
     transformed_name = name[:name.index(transformed_unit)].strip() if (transformed_unit and
+
                                                                        string_with_unit == name) else name
+
+
     # else:
     #     measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'teaspoon', 'cup', 'dash', 'jar',
     #                          'cups', 'tbsp', 'tablespoon', 'ml', 'g', 'head', 'heads', 'can', 'cans', 'cloves']
