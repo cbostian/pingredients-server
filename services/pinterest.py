@@ -52,7 +52,6 @@ def transform_ingredients(pin):
     return pin
 
 
-#this function never gets called
 def transform_unicode_and_fractions(string):
     if filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape')):
         return convert_unicode(string)
@@ -69,51 +68,58 @@ def convert_fraction(string_to_convert):
 
 
 def convert_unicode(string_to_convert):
-    unicode_fraction = filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string_to_convert.decode('unicode-escape'))
-    transformed_unicode = repr(unicodedata.numeric(unicode_fraction))
-    new_string = string_to_convert.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
+    unicode_fraction = filter(lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'),
+                              string_to_convert.decode('unicode-escape'))
+    transformed_unicode = unicodedata.numeric(unicode_fraction)
+    new_string = string_to_convert.decode('unicode-escape').replace(unicode_fraction,
+                                                                    transformed_unicode).encode('utf-8')
     return new_string
 
 
 def transform_ingredient(ingredient):
-    amount = ingredient['amount'] or ''
-    name = ingredient['name']
+    amount = transform_unicode_and_fractions(ingredient['amount']) or ''
+    name = transform_unicode_and_fractions(ingredient['name'])
     string_with_unit = amount
     if not amount or amount.isdigit():
         string_with_unit = name
 
-    transformed_amount = float((filter(lambda word: word.isdigit(), amount) or [0.0])[0])
-    transformed_unit = derive_unit(string_with_unit)
-    transformed_name = name[:name.index(transformed_unit)].strip() if (transformed_unit and
+    # example: amount: 1, name: apple
+    if amount.isdigit() and name.isaplpha():
+        transformed_amount = amount
+        transformed_unit = name
+        transformed_name = name
+        return dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
+    # example: amount: 1 tsp, name: olive oil
+    else:
+        if len(derive_unit(string_with_unit)) == 1:
+            transformed_unit = derive_unit(string_with_unit)[0]
+            transformed_amount = filter(lambda x: x.isspace() or x.isdigit(), string_with_unit[:string_with_unit.index(transformed_unit)].strip())
+            transformed_name = name[name.index(transformed_unit):].strip() if (transformed_unit and
+                                                                               string_with_unit == name) else name
 
-                                                                       string_with_unit == name) else name
+        else:
 
 
-    # else:
-    #     measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'teaspoon', 'cup', 'dash', 'jar',
-    #                          'cups', 'tbsp', 'tablespoon', 'ml', 'g', 'head', 'heads', 'can', 'cans', 'cloves']
-    #     measure_list = filter(amount.split().__contains__, measurement_array)
-    #     if len(measure_list) == 1:
-    #         if amount[:amount.index(measure_list[0])].isdigit() and not amount[(
-    #                 amount.index(measure_list[0]) + len(measure_list[0])):]:
-    #             transformed_amount = amount[:amount.index(measure_list[0])]
-    #             transformed_unit = measure_list[0]
-    #             transformed_name = name
-    #     else:
-    #         # JB: not sure what this code does, we add stuff to measure_indices but then measure_indices is never used
-    #         measure_indices = dict()
-    #         for measure in measure_list:
-    #             measure_indices[measure] = measure_indices.setdefault(measure, []).append(
-    #                 amount[:amount.index(measure)] + amount[amount.index(measure) + len(measure):])
 
     return dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
 
 
 def derive_unit(string_with_unit):
-    valid_units = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',
-                   'head', 'can', 'clove']
+    valid_units = ['gram', 'grams', 'gramme', 'grammes', 'g', 'milligram', 'milligrams', 'ml', 'kilogram', 'kilograms',
+                   'kilogramme', 'kilogrammes', 'k', 'EL', 'TL', 'oz', 'ounce', 'lb', 'tsp','teaspoon', 'teaspoons',
+                   'cup', 'cups', 'tbsp', 'tablespoon', 'tablespoons', 'T', 'qts', 'quarts','pint', 'pints', 'dash',
+                   'jar', 'head', 'can', 'clove', 'portion', 'portions', 'stalk', 'stalks']
+    return filter(string_with_unit.split().__contains__, valid_units) or ['']
 
-    return (filter(string_with_unit.split().__contains__, valid_units) or [''])[0]
+def determine_unit_grouping():
+    metric_units = ['gram', 'grams', 'gramme', 'grammes', 'g', 'milligram', 'milligrams', 'ml', 'kilogram',
+                    'kilograms', 'kilogramme', 'kilogrammes', 'k', 'EL', 'TL']
+
+    us_units = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'teaspoons', 'cup', 'cups', 'tbsp',
+                'tablespoon', 'tablespoons', 'T', 'qts', 'quarts', 'pint', 'pints']
+
+    misc_units = ['dash', 'jar', 'head', 'can', 'clove', 'portion', 'portions', 'stalk', 'stalks']
+
 
 
 def transform_servings(pin):
