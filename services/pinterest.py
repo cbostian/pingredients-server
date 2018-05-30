@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import unicodedata
 
@@ -51,54 +52,26 @@ def transform_ingredients(pin):
     return pin
 
 
-#this function never gets called
-def transform_unicode_and_fractions(string):
-    try:
-        fraction = ''.join(
-            filter(lambda x: str.isdigit(x) or x == '/' or str.isspace(x), string)).strip()
-        transformed_fraction = str(float(sum(Fraction(num) for num in fraction.split())))
-        string.replace(fraction, transformed_fraction)
-    except:
-        pass
-    try:
-        unicode_fraction = filter(
-            lambda x: unicodedata.name(x).startswith('VULGAR FRACTION'), string.decode('unicode-escape'))
-        transformed_unicode = str(unicodedata.numeric(unicode_fraction))
-        string.decode('unicode-escape').replace(unicode_fraction, transformed_unicode).encode('utf-8')
-    except:
-        pass
-    return string
-
-
 def transform_ingredient(ingredient):
-    amount = ingredient['amount'] or ''
+    amount = convert_fraction(ingredient['amount'] or '')
     name = ingredient['name']
     string_with_unit = amount
     if not amount or amount.isdigit():
         string_with_unit = name
 
-    transformed_amount = float((filter(lambda word: word.isdigit(), amount) or [0.0])[0])
+    transformed_amount = (re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", amount) or [0.0])[0]
     transformed_unit = derive_unit(string_with_unit)
     transformed_name = name[:name.index(transformed_unit)].strip() if (transformed_unit and
                                                                        string_with_unit == name) else name
-    # else:
-    #     measurement_array = ['oz', 'ounces', 'lb', 'lbs', 'tsp', 'teaspoon', 'cup', 'dash', 'jar',
-    #                          'cups', 'tbsp', 'tablespoon', 'ml', 'g', 'head', 'heads', 'can', 'cans', 'cloves']
-    #     measure_list = filter(amount.split().__contains__, measurement_array)
-    #     if len(measure_list) == 1:
-    #         if amount[:amount.index(measure_list[0])].isdigit() and not amount[(
-    #                 amount.index(measure_list[0]) + len(measure_list[0])):]:
-    #             transformed_amount = amount[:amount.index(measure_list[0])]
-    #             transformed_unit = measure_list[0]
-    #             transformed_name = name
-    #     else:
-    #         # JB: not sure what this code does, we add stuff to measure_indices but then measure_indices is never used
-    #         measure_indices = dict()
-    #         for measure in measure_list:
-    #             measure_indices[measure] = measure_indices.setdefault(measure, []).append(
-    #                 amount[:amount.index(measure)] + amount[amount.index(measure) + len(measure):])
 
     return dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
+
+
+def convert_fraction(string_to_convert):
+    fraction = ''.join(filter(lambda x: x.isdigit() or x == '/' or x.isspace(), string_to_convert)).strip()
+    transformed_fraction = repr(float(sum(Fraction(num) for num in fraction.split())))
+    new_string = string_to_convert.replace(fraction, transformed_fraction)
+    return new_string
 
 
 def derive_unit(string_with_unit):
