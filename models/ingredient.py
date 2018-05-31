@@ -1,6 +1,6 @@
 from difflib import SequenceMatcher
 
-from helpers.ingredient_synonyms import ingredient_common_adjectives
+from helpers.grocery_list.ingredient_synonyms import INGREDIENT_COMMON_ADJECTIVES
 
 
 class Ingredient():
@@ -22,7 +22,7 @@ class Ingredient():
 
     def valid_names_sorted(self):
         valid_names = [''.join(sorted(self.name.lower().split(' ')))]
-        for adjective in ingredient_common_adjectives.get(self.name, {}).get('common_adjectives', []):
+        for adjective in INGREDIENT_COMMON_ADJECTIVES.get(self.name, {}).get('common_adjectives', []):
             valid_names.append(''.join(sorted((self.name.lower() + ' ' + adjective).split(' '))))
         return valid_names
 
