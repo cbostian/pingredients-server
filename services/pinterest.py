@@ -1,12 +1,9 @@
 import os
-import re
 import requests
-import unicodedata
 
 from copy import deepcopy
-from fractions import Fraction
 from fixtures.recipe_samples import RECIPE_SAMPLES
-from models.ingredient import Ingredient
+from helpers.grocery_list.ingredient_transformations import transform_ingredients
 
 
 base_url = 'https://api.pinterest.com/v1'
@@ -35,50 +32,6 @@ def get_pins_from_pinterest(oauth_token, cursor, query):
     response = requests.get(request_url, params=query_params)
 
     return response.json()
-
-
-def transform_ingredients(pin):
-    ingredients_dict = {}
-    recipe = pin['metadata']['recipe']
-
-    if not recipe.get('ingredients', []):
-        return pin
-
-    for ingredients in recipe['ingredients']:
-        for ingredient in ingredients.get('ingredients', []):
-            ingredients_dict.setdefault(ingredients['category'], []).append(transform_ingredient(ingredient))
-
-    recipe['ingredients'] = ingredients_dict
-    return pin
-
-
-def transform_ingredient(ingredient):
-    amount = convert_fraction(ingredient['amount'] or '')
-    name = ingredient['name']
-    string_with_unit = amount
-    if not amount or amount.isdigit():
-        string_with_unit = name
-
-    transformed_amount = (re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", amount) or [0.0])[0]
-    transformed_unit = derive_unit(string_with_unit)
-    transformed_name = name[:name.index(transformed_unit)].strip() if (transformed_unit and
-                                                                       string_with_unit == name) else name
-
-    return dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit)
-
-
-def convert_fraction(string_to_convert):
-    fraction = ''.join(filter(lambda x: x.isdigit() or x == '/' or x.isspace(), string_to_convert)).strip()
-    transformed_fraction = repr(float(sum(Fraction(num) for num in fraction.split())))
-    new_string = string_to_convert.replace(fraction, transformed_fraction)
-    return new_string
-
-
-def derive_unit(string_with_unit):
-    valid_units = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',
-                   'head', 'can', 'clove']
-
-    return (filter(string_with_unit.split().__contains__, valid_units) or [''])[0]
 
 
 def transform_servings(pin):
