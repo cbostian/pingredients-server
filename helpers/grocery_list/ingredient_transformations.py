@@ -2,7 +2,8 @@ import re
 import unicodedata
 
 from fractions import Fraction
-from helpers.grocery_list.irrelevant_words import remove_irrelevant_words
+from constants.grocery_list import VALID_UNITS
+from helpers.grocery_list.conjunction_parsing import split_conjunctions, is_conjunction_between_numbers
 
 
 def transform_ingredients(pin):
@@ -22,8 +23,8 @@ def transform_ingredients(pin):
 
 
 def transform_ingredient(ingredient):
-    name = remove_irrelevant_words(ingredient['name'])
-    amount = remove_irrelevant_words(ingredient['amount'] or '')
+    name = ingredient['name']
+    amount = ingredient['amount'] or ''
     if not amount:
         name = convert_fractions(name)
         amount = name
@@ -52,12 +53,14 @@ def transform_ingredient(ingredient):
 
 def convert_fractions(string_to_convert):
     fraction = ''.join(filter(lambda x: is_character_part_of_fraction(x, string_to_convert), string_to_convert)).strip()
+    if not fraction:
+        return string_to_convert
     transformed_fraction = repr(float(sum(Fraction(num) for num in fraction.split())))
     return convert_unicode_fractions(string_to_convert.replace(fraction, transformed_fraction))
 
 
 def is_character_part_of_fraction(character, string):
-    return (character.isdigit() or (character == '/' and is_conjunction_between_amount('/', string))
+    return (character.isdigit() or (character == '/' and is_conjunction_between_numbers('/', string))
             or character.isspace())
 
 
@@ -70,38 +73,4 @@ def convert_unicode_fractions(string_to_convert):
 
 
 def derive_unit(string_with_unit):
-    valid_units = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',
-                   'head', 'can', 'clove']
-
-    return (filter(string_with_unit.split().__contains__, valid_units) or [''])[0]
-
-
-def split_conjunctions(ingredient):
-    ingredients = [ingredient]
-    for conjunction in ['and', '&']:
-        if conjunction in ingredient['name'] and not is_conjunction_between_amount(conjunction, ingredient['name']):
-            halved_amount = ingredient['amount'] / 2
-            words, word_with_conjunction = split_words_on_conjunction(conjunction, ingredient['name'])
-
-            ingredient['amount'] = halved_amount
-            ingredient['name'] = ''.join(words[:words.index(word_with_conjunction)])
-
-            ingredients.append({
-                'amount': halved_amount,
-                'name': ''.join(words[words.index(word_with_conjunction) + 1:]),
-                'unit': ingredient['unit']
-            })
-    return ingredients
-
-
-def is_conjunction_between_amount(conjunction, string):
-    words, word_with_conjunction = split_words_on_conjunction(conjunction, string)
-    return (words[words.index(word_with_conjunction) - 1].isdigit()
-            and words[words.index(word_with_conjunction) + 1].isdigit())
-
-
-def split_words_on_conjunction(conjunction, string):
-    words = string.split(' ')
-    word_with_conjunction = [word for word in words if conjunction in word][0]
-
-    return words, word_with_conjunction
+    return (filter(string_with_unit.split().__contains__, VALID_UNITS) or [''])[0]

@@ -1,6 +1,6 @@
 from difflib import SequenceMatcher
 
-from helpers.grocery_list.ingredient_synonyms import INGREDIENT_COMMON_ADJECTIVES
+from constants.grocery_list import INGREDIENT_COMMON_ADJECTIVES
 
 
 class Ingredient():

@@ -1,3 +1,6 @@
+ADDITIVE_CONJUNCTIONS = ['and', '&']
+EXCLUSIVE_CONJUNCTIONS = ['or', '/']
+
 INGREDIENT_COMMON_ADJECTIVES = {
     'pepper': {
         'common_adjectives': ['black', 'cracked']
@@ -76,3 +79,31 @@ INGREDIENT_COMMON_ADJECTIVES = {
         'common_adjectives': ['red']
     },
 }
+
+IRRELEVANT_WORDS = [
+    'fresh',
+    'small',
+    'large',
+    'medium',
+    'see notes',
+    'optional',
+    'peeled',
+    'cut',
+    'pieces',
+    'into',
+    'with',
+    'stems',
+    'removed',
+    'super',
+    'firm',
+    'cooked',
+    '*',
+    '(',
+    ')',
+    '+',
+    ',',
+    'vegan',
+]
+
+VALID_UNITS = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',
+               'head', 'can', 'clove']

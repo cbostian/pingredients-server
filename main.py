@@ -1,3 +1,5 @@
+import traceback
+
 import requests_toolbelt.adapters.appengine
 from flask import Flask, jsonify, request
 from google.appengine.ext import ndb
@@ -16,7 +18,8 @@ app = Flask(__name__)
 
 @app.errorhandler(500)
 def internal_error(error):
-    print error.message
+    print error
+    traceback.print_exc()
 
 
 @app.route('/recipes')
