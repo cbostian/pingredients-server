@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 from google.appengine.ext import ndb
 
 from decorators.request import authorize
-from models.ingredient import Ingredient
+from helpers.grocery_list.ingredient_combination import combine_ingredients
 from models.making_recipe import MakingRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
@@ -64,26 +64,5 @@ def unmake_recipe(_, user_id, recipe_id):
 @app.route('/grocery-list')
 @authorize()
 def get_groceries(_, user_id):
-    making_recipes = ndb.Key(User, user_id).get().making_recipes
-    grocery_list = {}
-
-    def add_ingredient_to_grocery_list(ingredient_to_compare, category):
-        for ingredient in grocery_list.get(category, []):
-            if ingredient == ingredient_to_compare:
-                try:
-                    ingredient.amount += ingredient_to_compare.amount
-                except:
-                    print ingredient.to_dict()
-                    print '\n'
-                    print ingredient_to_compare.to_dict()
-                    print '\n'
-                return
-        grocery_list.setdefault(category, []).append(ingredient_to_compare)
-
-    for making_recipe in making_recipes:
-        for category, ingredients in making_recipe.metadata.recipe.ingredients.items():
-            for ingredient in ingredients:
-                add_ingredient_to_grocery_list(Ingredient.from_dict(ingredient), category)
-
-    return jsonify({category: map(lambda ingredient: ingredient.to_dict(), ingredients)
-                    for category, ingredients in grocery_list.items()})
+    return jsonify({category: map(lambda ingredient: ingredient.to_dict(), ingredients) for
+                    category, ingredients in combine_ingredients(ndb.Key(User, user_id).get().making_recipes).items()})

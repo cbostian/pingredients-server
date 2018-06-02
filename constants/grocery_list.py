@@ -103,6 +103,7 @@ IRRELEVANT_WORDS = [
     '+',
     ',',
     'vegan',
+    'reduced'
 ]
 
 VALID_UNITS = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',

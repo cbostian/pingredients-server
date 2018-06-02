@@ -27,6 +27,10 @@ class Ingredient():
         return valid_names
 
     def __eq__(self, other):
+        if self.do_names_match(other):
+            if not self.unit or not other.unit:
+                self.unit = other.unit = self.unit or other.unit
+
         return self.do_names_match(other) and self.unit == other.unit
 
     def do_names_match(self, other):
