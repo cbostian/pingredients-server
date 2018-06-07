@@ -64,5 +64,4 @@ def unmake_recipe(_, user_id, recipe_id):
 @app.route('/grocery-list')
 @authorize()
 def get_groceries(_, user_id):
-    return jsonify({category: map(lambda ingredient: ingredient.to_dict(), ingredients) for
-                    category, ingredients in combine_ingredients(ndb.Key(User, user_id).get().making_recipes).items()})
+    return jsonify(combine_ingredients(ndb.Key(User, user_id).get().making_recipes).items())

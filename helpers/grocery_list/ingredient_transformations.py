@@ -25,6 +25,7 @@ def transform_ingredients(pin):
 def transform_ingredient(ingredient):
     name = ingredient['name']
     amount = ingredient['amount'] or ''
+
     if not amount:
         name = convert_fractions(name)
         amount = name
@@ -41,6 +42,7 @@ def transform_ingredient(ingredient):
 
     transformed_amount = float((re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", amount) or [0.0])[0])
     transformed_unit = derive_unit(string_with_unit)
+
     if transformed_unit and string_with_unit == name:
         if name.index(transformed_unit) > (len(name) / 2):
             transformed_name = name[:name.index(transformed_unit)].strip()
@@ -48,6 +50,7 @@ def transform_ingredient(ingredient):
             transformed_name = name[name.index(transformed_unit) + len(transformed_unit):].strip()
     else:
         transformed_name = name
+
     return split_conjunctions(dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit))
 
 
@@ -73,4 +76,7 @@ def convert_unicode_fractions(string_to_convert):
 
 
 def derive_unit(string_with_unit):
-    return (filter(string_with_unit.split().__contains__, VALID_UNITS) or [''])[0]
+    for valid_unit in VALID_UNITS:
+        if ' ' + valid_unit in string_with_unit:
+            return valid_unit
+    return ''

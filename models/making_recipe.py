@@ -80,4 +80,12 @@ class MakingRecipe(ndb.Model):
             ),
             board=Board(name=recipe_dict.get('board', {}).get('name', '')),
             making=True
-        )
+        ).handle_bad_swift_floats()
+
+    def handle_bad_swift_floats(self):
+        # swift sends floats with a .0 as an int - for example, 4.0 will be sent as 4
+        for _, ingredients in self.metadata.recipe.ingredients.items():
+            for ingredient in ingredients:
+                ingredient['amount'] = float(ingredient.get('amount', 0.0))
+
+        return self

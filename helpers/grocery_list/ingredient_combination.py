@@ -1,11 +1,12 @@
-from models.ingredient import Ingredient
-
-
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list):
     for ingredient in grocery_list.get(category, []):
-        if ingredient == ingredient_to_compare:
-            ingredient.amount += ingredient_to_compare.amount
-            return
+        if ingredient['name'] == ingredient_to_compare['name']:
+            if not ingredient['unit'] or not ingredient_to_compare['unit']:
+                ingredient['unit'] = ingredient_to_compare['unit'] = ingredient['unit'] or ingredient_to_compare['unit']
+
+            if ingredient['unit'] == ingredient_to_compare['unit']:
+                ingredient['amount'] += ingredient_to_compare['amount']
+                return
 
     grocery_list.setdefault(category, []).append(ingredient_to_compare)
 
@@ -16,7 +17,7 @@ def combine_ingredients(making_recipes):
     for making_recipe in making_recipes:
         for category, ingredients in making_recipe.metadata.recipe.ingredients.items():
             grocery_list.setdefault(category, [])
-            grocery_list[category] += [Ingredient.from_dict(ingredient) for ingredient in ingredients]
+            grocery_list[category] += ingredients
 
     combine_ingredients_across_categories(grocery_list)
 
@@ -32,9 +33,9 @@ def combine_ingredients_across_categories(grocery_list):
     ingredient_occurrences = {}
     for category, ingredients in grocery_list.items():
         for ingredient in ingredients:
-            ingredient_occurrences.setdefault(ingredient.name, {})
-            ingredient_occurrences[ingredient.name].setdefault(category, 0)
-            ingredient_occurrences[ingredient.name][category] += 1
+            ingredient_occurrences.setdefault(ingredient['name'], {})
+            ingredient_occurrences[ingredient['name']].setdefault(category, 0)
+            ingredient_occurrences[ingredient['name']][category] += 1
     
     for name, categories in ingredient_occurrences.items():
         if len(categories.keys()) > 1:
@@ -51,6 +52,6 @@ def combine_ingredients_across_categories(grocery_list):
 
 def return_and_remove_ingredient_from_category(name, category):
     for ingredient in category:
-        if ingredient.name == name:
+        if ingredient['name'] == name:
             category.remove(ingredient)
             return ingredient
