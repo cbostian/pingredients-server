@@ -1,5 +1,5 @@
 from constants.grocery_list import ADDITIVE_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, VALID_UNITS
-from helpers.grocery_list.text_sanitization import sanitize_name
+from helpers.grocery_list.name_sanitization import sanitize_name, get_preferred_name
 
 
 def split_conjunctions(ingredient):
@@ -24,9 +24,25 @@ def split_conjunctions(ingredient):
                             ingredient['name'] = ingredient['name'].replace(word, '')
                     ingredient['name'] = ' '.join(ingredient['name'].split())
                 else:
-                    ingredient['name'] = ' '.join(words[:words.index(word_with_conjunction)])
-    ingredient['name'] = sanitize_name(ingredient['name'])
+                    ingredient['name'] = get_preferred_name(split_exclusive_conjunctions(
+                        ingredient['name'], words, word_with_conjunction))
+    ingredient['name'] = get_preferred_name([sanitize_name(ingredient['name'])])
     return ingredients
+
+
+def split_exclusive_conjunctions(name, words, word_with_conjunction):
+    names = []
+
+    left = words[:words.index(word_with_conjunction)]
+    right = words[words.index(word_with_conjunction) + 1:]
+    if len(left) > len(right):
+        names.append(sanitize_name(' '.join(left)))
+    elif len(right) > len(left):
+        names.append(sanitize_name(' '.join(right)))
+    else:
+        names += [sanitize_name(' '.join(left)), sanitize_name(' '.join(right))]
+
+    return names or [name]
 
 
 def is_conjunction_between_numbers(conjunction, string):
