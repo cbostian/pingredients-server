@@ -1,11 +1,11 @@
-from constants.grocery_list import ADDITIVE_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, VALID_UNITS
+from constants.grocery_list import ADDITIVE_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
 from helpers.grocery_list.name_sanitization import sanitize_name, get_preferred_name
 
 
 def split_conjunctions(ingredient):
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
-        if conjunction in ingredient['name'] and not is_conjunction_between_numbers(conjunction, ingredient['name']):
+        if ' ' + conjunction + ' ' in ingredient['name'] and not is_conjunction_between_numbers(conjunction, ingredient['name']):
             words, word_with_conjunction = split_words_on_conjunction(conjunction, ingredient['name'])
             if conjunction in ADDITIVE_CONJUNCTIONS:
                 halved_amount = ingredient['amount'] / 2
@@ -20,7 +20,7 @@ def split_conjunctions(ingredient):
             else:
                 if is_conjunction_between_amount(conjunction, ingredient['name']):
                     for word in words:
-                        if word.isdigit() or word in VALID_UNITS or word == word_with_conjunction:
+                        if word.isdigit() or word in UNITS.keys() or word == word_with_conjunction:
                             ingredient['name'] = ingredient['name'].replace(word, '')
                     ingredient['name'] = ' '.join(ingredient['name'].split())
                 else:
@@ -46,9 +46,20 @@ def split_exclusive_conjunctions(name, words, word_with_conjunction):
 
 
 def is_conjunction_between_numbers(conjunction, string):
-    words, word_with_conjunction = split_words_on_conjunction(conjunction, string)
-    return (words[words.index(word_with_conjunction) - 1].isdigit()
-            and words[words.index(word_with_conjunction) + 1].isdigit())
+    left = get_closest_non_space_to_conjunction(conjunction, string, False)
+    right = get_closest_non_space_to_conjunction(conjunction, string, True)
+    return left.isdigit() and right.isdigit()
+
+
+def get_closest_non_space_to_conjunction(conjunction, string, incrementing):
+    closest = ''
+    closest_index = string.index(conjunction) + (1 if incrementing else -1)
+    while (not closest and not closest.isspace() and
+           (closest_index < len(string) if incrementing else closest_index >= 0)):
+        closest = string[closest_index]
+        closest_index += 1 if incrementing else -1
+
+    return closest
 
 
 def is_conjunction_between_amount(conjunction, string):

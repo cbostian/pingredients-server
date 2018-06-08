@@ -1,7 +1,7 @@
 from difflib import SequenceMatcher
 
-from constants.grocery_list import IRRELEVANT_WORDS
-from constants.grocery_list import INGREDIENT_COMMON_ADJECTIVES, PREFERRED_NAME_OVERRIDES
+from constants.grocery_list import (IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES, PREFERRED_NAME_OVERRIDES,
+                                    ALL_DERIVED_UNITS)
 
 
 def sanitize_name(name):
@@ -12,8 +12,9 @@ def sanitize_name(name):
 
 
 def remove_irrelevant_words(string):
-    irrelevant_words_in_string = filter(lambda word: word in string, IRRELEVANT_WORDS)
-    while any(word in string or word.isdigit() for word in irrelevant_words_in_string) and irrelevant_words_in_string:
+    irrelevant_words_in_string = filter(lambda word: word in string,
+                                        IRRELEVANT_WORDS + [' ' + unit for unit in ALL_DERIVED_UNITS])
+    while any(word in string for word in irrelevant_words_in_string) and irrelevant_words_in_string:
         string = string.replace(irrelevant_words_in_string.pop(0), '')
 
     string = filter(lambda char: not char.isdigit(), string)

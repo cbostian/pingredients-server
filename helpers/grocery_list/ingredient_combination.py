@@ -1,8 +1,14 @@
+from constants.grocery_list import UNITS
+
+
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list):
     for ingredient in grocery_list.get(category, []):
         if ingredient['name'] == ingredient_to_compare['name']:
             if not ingredient['unit'] or not ingredient_to_compare['unit']:
                 ingredient['unit'] = ingredient_to_compare['unit'] = ingredient['unit'] or ingredient_to_compare['unit']
+
+            convert_major_units_to_minor(ingredient_to_compare)
+            convert_major_units_to_minor(ingredient)
 
             if ingredient['unit'] == ingredient_to_compare['unit']:
                 ingredient['amount'] += ingredient_to_compare['amount']
@@ -55,3 +61,13 @@ def return_and_remove_ingredient_from_category(name, category):
         if ingredient['name'] == name:
             category.remove(ingredient)
             return ingredient
+
+
+def convert_major_units_to_minor(ingredient):
+    if not UNITS.get(ingredient['unit'], {}).get('major_to_minor'):
+        return
+
+    ingredient['amount'] *= UNITS[ingredient['unit']]['major_to_minor']['ratio']
+    ingredient['unit'] = UNITS[ingredient['unit']]['major_to_minor']['unit']
+
+    convert_major_units_to_minor(ingredient)

@@ -30,7 +30,8 @@ INGREDIENT_COMMON_ADJECTIVES = {
 }
 
 PREFERRED_NAME_OVERRIDES = {
-    'broth': 'vegetable broth'
+    'broth': 'vegetable broth',
+    'oil': 'olive oil'
 }
 
 IRRELEVANT_WORDS = [
@@ -56,8 +57,62 @@ IRRELEVANT_WORDS = [
     '+',
     ',',
     'vegan',
-    'reduced'
+    'reduced',
+    '-'
 ]
 
-VALID_UNITS = ['oz', 'ounce', 'lb', 'tsp', 'teaspoon', 'cup', 'dash', 'jar', 'tbsp', 'tablespoon', 'ml', 'g',
-               'head', 'can', 'clove']
+UNITS = {
+    'oz': {
+        'synonyms': ['ounce'],
+        'major_to_minor': {}
+    },
+    'lb': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'tsp': {
+        'synonyms': ['teaspoon'],
+        'major_to_minor': {}
+    },
+    'cup': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'dash': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'jar': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'tbsp': {
+        'synonyms': ['tablespoon'],
+        'major_to_minor': {'unit': 'tsp', 'ratio': 3.0}
+    },
+    'ml': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'g': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'head': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'can': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
+    'clove': {
+        'synonyms': [],
+        'major_to_minor': {}
+    }
+}
+
+ALL_DERIVED_UNITS = []
+for unit, unit_properties in UNITS.items():
+    ALL_DERIVED_UNITS += [unit] + unit_properties['synonyms']
+

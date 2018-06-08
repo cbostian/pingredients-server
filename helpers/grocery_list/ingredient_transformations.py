@@ -2,7 +2,7 @@ import re
 import unicodedata
 
 from fractions import Fraction
-from constants.grocery_list import VALID_UNITS
+from constants.grocery_list import UNITS, ALL_DERIVED_UNITS
 from helpers.grocery_list.conjunction_parsing import split_conjunctions, is_conjunction_between_numbers
 
 
@@ -27,31 +27,27 @@ def transform_ingredient(ingredient):
     amount = ingredient['amount'] or ''
 
     if not amount:
-        name = convert_fractions(name)
         amount = name
-    else:
-        amount = convert_fractions(amount)
 
-    string_with_unit = amount
-    for numeric_conversion in [float, int]:
-        try:
-            numeric_conversion(amount)
-            string_with_unit = name
-        except ValueError:
-            pass
+    string_with_unit = amount if any(unit in amount for unit in ALL_DERIVED_UNITS) else name
 
-    transformed_amount = float((re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", amount) or [0.0])[0])
-    transformed_unit = derive_unit(string_with_unit)
+    transformed_amount = max(get_number_from_string(amount), get_number_from_string(name))
+    transformed_unit, unit = derive_unit(string_with_unit)
 
     if transformed_unit and string_with_unit == name:
-        if name.index(transformed_unit) > (len(name) / 2):
-            transformed_name = name[:name.index(transformed_unit)].strip()
+        if name.index(unit) > (len(name) / 2):
+            transformed_name = name[:name.index(unit)].strip()
         else:
-            transformed_name = name[name.index(transformed_unit) + len(transformed_unit):].strip()
+            transformed_name = name[name.index(unit) + len(unit):].strip()
     else:
         transformed_name = name
 
     return split_conjunctions(dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit))
+
+
+def get_number_from_string(string):
+    return float(max((re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?",
+                                 convert_fractions(string.replace('-', ' '))) or [0.0])))
 
 
 def convert_fractions(string_to_convert):
@@ -76,7 +72,15 @@ def convert_unicode_fractions(string_to_convert):
 
 
 def derive_unit(string_with_unit):
-    for valid_unit in VALID_UNITS:
-        if ' ' + valid_unit in string_with_unit:
-            return valid_unit
-    return ''
+    min_unit_index = len(string_with_unit)
+    derived_unit = original_unit = ''
+    for unit, unit_properties in UNITS.items():
+        for synonym in unit_properties['synonyms'] + [unit]:
+            if ' ' + synonym in string_with_unit:
+                unit_index = string_with_unit.index(' ' + synonym)
+                if unit_index < min_unit_index:
+                    derived_unit = unit
+                    original_unit = synonym
+                    min_unit_index = unit_index
+
+    return derived_unit, original_unit
