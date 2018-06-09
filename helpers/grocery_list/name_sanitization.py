@@ -4,21 +4,30 @@ from constants.grocery_list import (IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIV
                                     ALL_DERIVED_UNITS)
 
 
-def sanitize_name(name):
-    sanitized_name = name.lower()
-    sanitized_name = remove_irrelevant_words(sanitized_name)
-
-    return sanitized_name.strip()
+def sanitize_name(names):
+    return get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names]))
 
 
-def remove_irrelevant_words(string):
-    irrelevant_words_in_string = filter(lambda word: word in string,
-                                        IRRELEVANT_WORDS + [' ' + unit for unit in ALL_DERIVED_UNITS])
-    while any(word in string for word in irrelevant_words_in_string) and irrelevant_words_in_string:
-        string = string.replace(irrelevant_words_in_string.pop(0), '')
+def remove_irrelevant_words(name):
+    irrelevant_words_in_name = filter(lambda word: word in name, IRRELEVANT_WORDS +
+                                      [' ' + unit + ('' if len(unit) > 1 else ' ') for unit in ALL_DERIVED_UNITS])
+    while any(word in name for word in irrelevant_words_in_name) and irrelevant_words_in_name:
+        irrelevant_word = irrelevant_words_in_name.pop(0)
 
-    string = filter(lambda char: not char.isdigit(), string)
-    return string
+        try:
+            irrelevant_word_index = name.index(irrelevant_word)
+        except ValueError:
+            continue
+
+        to_remove = irrelevant_word
+        next_space_index = name.find(' ', irrelevant_word_index)
+        if next_space_index > 0 and len(irrelevant_word) > 1 and ' ' not in irrelevant_word:
+            to_remove = name[irrelevant_word_index:next_space_index]
+
+        name = name.replace(to_remove, ' ')
+
+    name = filter(lambda char: not char.isdigit(), name)
+    return name.strip()
 
 
 def get_preferred_name(names):

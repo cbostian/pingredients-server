@@ -39,7 +39,8 @@ IRRELEVANT_WORDS = [
     'small',
     'large',
     'medium',
-    'see notes',
+    'see',
+    'notes',
     'optional',
     'peeled',
     'cut',
@@ -58,7 +59,8 @@ IRRELEVANT_WORDS = [
     ',',
     'vegan',
     'reduced',
-    '-'
+    '-',
+    'to drizzle'
 ]
 
 UNITS = {
