@@ -1,20 +1,21 @@
 from constants.grocery_list import ADDITIVE_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
-from helpers.grocery_list.name_sanitization import sanitize_name, get_preferred_name
+from helpers.grocery_list.name_sanitization import sanitize_name
 
 
 def split_conjunctions(ingredient):
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
-        if ' ' + conjunction + ' ' in ingredient['name'] and not is_conjunction_between_numbers(conjunction, ingredient['name']):
+        if (' ' + conjunction + ' ' in ingredient['name'] and
+                not is_conjunction_between_numbers(conjunction, ingredient['name'])):
             words, word_with_conjunction = split_words_on_conjunction(conjunction, ingredient['name'])
             if conjunction in ADDITIVE_CONJUNCTIONS:
                 halved_amount = ingredient['amount'] / 2
                 ingredient['amount'] = halved_amount
-                ingredient['name'] = sanitize_name(''.join(words[:words.index(word_with_conjunction)]))
+                ingredient['name'] = sanitize_name([' '.join(words[:words.index(word_with_conjunction)])])
 
                 ingredients.append({
                     'amount': halved_amount,
-                    'name': sanitize_name(''.join(words[words.index(word_with_conjunction) + 1:])),
+                    'name': sanitize_name([' '.join(words[words.index(word_with_conjunction) + 1:])]),
                     'unit': ingredient['unit']
                 })
             else:
@@ -22,11 +23,10 @@ def split_conjunctions(ingredient):
                     for word in words:
                         if word.isdigit() or word in UNITS.keys() or word == word_with_conjunction:
                             ingredient['name'] = ingredient['name'].replace(word, '')
-                    ingredient['name'] = ' '.join(ingredient['name'].split())
                 else:
-                    ingredient['name'] = get_preferred_name(split_exclusive_conjunctions(
+                    ingredient['name'] = sanitize_name(split_exclusive_conjunctions(
                         ingredient['name'], words, word_with_conjunction))
-    ingredient['name'] = get_preferred_name([sanitize_name(ingredient['name'])])
+    ingredient['name'] = sanitize_name([ingredient['name']])
     return ingredients
 
 
@@ -36,11 +36,11 @@ def split_exclusive_conjunctions(name, words, word_with_conjunction):
     left = words[:words.index(word_with_conjunction)]
     right = words[words.index(word_with_conjunction) + 1:]
     if len(left) > len(right):
-        names.append(sanitize_name(' '.join(left)))
+        names.append(' '.join(left))
     elif len(right) > len(left):
-        names.append(sanitize_name(' '.join(right)))
+        names.append(' '.join(right))
     else:
-        names += [sanitize_name(' '.join(left)), sanitize_name(' '.join(right))]
+        names += [' '.join(left), ' '.join(right)]
 
     return names or [name]
 
