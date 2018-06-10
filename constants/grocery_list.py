@@ -59,7 +59,10 @@ IRRELEVANT_WORDS = [
     'vegan',
     'reduced',
     '-',
-    'to drizzle'
+    'to drizzle',
+    '%',
+    'pure',
+    'of'
 ]
 
 UNITS = {
