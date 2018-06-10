@@ -9,15 +9,7 @@ def split_conjunctions(ingredient):
                 not is_conjunction_between_numbers(conjunction, ingredient['name'])):
             words, word_with_conjunction = split_words_on_conjunction(conjunction, ingredient['name'])
             if conjunction in ADDITIVE_CONJUNCTIONS:
-                halved_amount = ingredient['amount'] / 2
-                ingredient['amount'] = halved_amount
-                ingredient['name'] = sanitize_name([' '.join(words[:words.index(word_with_conjunction)])])
-
-                ingredients.append({
-                    'amount': halved_amount,
-                    'name': sanitize_name([' '.join(words[words.index(word_with_conjunction) + 1:])]),
-                    'unit': ingredient['unit']
-                })
+                ingredients.append(split_additive_conjunctions(ingredient, words, word_with_conjunction))
             else:
                 if is_conjunction_between_amount(conjunction, ingredient['name']):
                     for word in words:
@@ -45,21 +37,42 @@ def split_exclusive_conjunctions(name, words, word_with_conjunction):
     return names or [name]
 
 
+def split_additive_conjunctions(ingredient, words, word_with_conjunction):
+    left_name = ' '.join(words[:words.index(word_with_conjunction)])
+    right_name = ' '.join(words[words.index(word_with_conjunction) + 1:])
+    if ',' in left_name:
+        _, primary_noun_index = get_closest_to_character(',', left_name, False, lambda char: char.isspace())
+        right_name = left_name[primary_noun_index:left_name.index(',')] + ' ' + right_name
+    elif ',' in right_name:
+        _, primary_noun_index = get_closest_to_character(', ', right_name, True, lambda char: char.isspace())
+        left_name += ' ' + right_name[right_name.index(', ') + 2:primary_noun_index + 1]
+
+    halved_amount = ingredient['amount'] / 2
+    ingredient['amount'] = halved_amount
+    ingredient['name'] = sanitize_name([left_name])
+
+    return {
+        'amount': halved_amount,
+        'name': sanitize_name([right_name]),
+        'unit': ingredient['unit']
+    }
+
+
 def is_conjunction_between_numbers(conjunction, string):
-    left = get_closest_non_space_to_conjunction(conjunction, string, False)
-    right = get_closest_non_space_to_conjunction(conjunction, string, True)
+    left, _ = get_closest_to_character(conjunction, string, False)
+    right, _ = get_closest_to_character(conjunction, string, True)
     return left.isdigit() and right.isdigit()
 
 
-def get_closest_non_space_to_conjunction(conjunction, string, incrementing):
-    closest = ''
-    closest_index = string.index(conjunction) + (1 if incrementing else -1)
-    while (not closest and not closest.isspace() and
-           (closest_index < len(string) if incrementing else closest_index >= 0)):
-        closest = string[closest_index]
+def get_closest_to_character(character, string, incrementing, condition=lambda char: not char.isspace()):
+    closest_index = (string.index(character) + (1 if incrementing else -1) +
+                     (len(character) if len(character) > 1 and incrementing else 0))
+    closest = string[closest_index]
+    while not condition(closest) and (closest_index < (len(string) - 1) if incrementing else closest_index > 0):
         closest_index += 1 if incrementing else -1
+        closest = string[closest_index]
 
-    return closest
+    return closest, closest_index
 
 
 def is_conjunction_between_amount(conjunction, string):
