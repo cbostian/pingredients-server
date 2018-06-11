@@ -6,7 +6,7 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'garlic': [],
     'chili flake': ['red'],
     'pumpkin': ['canned'],
-    'flour': ['all purpose'],
+    'flour': ['all-purpose'],
     'salt': ['kosher'],
     'oil': ['olive', 'cooking'],
     'parmesan cheese': ['grated'],
@@ -31,7 +31,11 @@ INGREDIENT_COMMON_ADJECTIVES = {
 
 PREFERRED_NAME_OVERRIDES = {
     'broth': 'vegetable broth',
-    'oil': 'olive oil'
+    'oil': 'olive oil',
+    'onion': 'yellow onion',
+    'potato': 'russet potato',
+    'cheese': 'cheddar cheese',
+    'shredded cheese': 'shredded cheddar cheese'
 }
 
 IRRELEVANT_WORDS = [
