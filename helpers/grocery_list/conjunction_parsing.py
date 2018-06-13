@@ -5,41 +5,39 @@ from helpers.grocery_list.name_sanitization import sanitize_name
 def split_conjunctions(ingredient):
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
-        if (' ' + conjunction + ' ' in ingredient['name'] and
-                not is_conjunction_between_numbers(conjunction, ingredient['name'])):
-            words, word_with_conjunction = split_words_on_conjunction(conjunction, ingredient['name'])
-            if conjunction in ADDITIVE_CONJUNCTIONS:
-                ingredients.append(split_additive_conjunctions(ingredient, words, word_with_conjunction))
+        contextual_conjunction = get_contextual_conjunction(conjunction)
+        if (contextual_conjunction not in ingredient['name'] or
+                is_conjunction_between_numbers(conjunction, ingredient['name'])):
+            continue
+
+        words = split_words_on_conjunction(contextual_conjunction, ingredient['name'])
+        if conjunction in ADDITIVE_CONJUNCTIONS:
+            ingredients.append(split_additive_conjunctions(ingredient, words, conjunction))
+        else:
+            if is_conjunction_between_amount(conjunction, ingredient['name']):
+                for word in words:
+                    if word.isdigit() or word in UNITS.keys() or word == conjunction:
+                        ingredient['name'] = ingredient['name'].replace(word, '')
             else:
-                if is_conjunction_between_amount(conjunction, ingredient['name']):
-                    for word in words:
-                        if word.isdigit() or word in UNITS.keys() or word == word_with_conjunction:
-                            ingredient['name'] = ingredient['name'].replace(word, '')
-                else:
-                    ingredient['name'] = sanitize_name(split_exclusive_conjunctions(
-                        ingredient['name'], words, word_with_conjunction))
+                ingredient['name'] = sanitize_name(split_exclusive_conjunctions(words, conjunction))
     ingredient['name'] = sanitize_name([ingredient['name']])
     return ingredients
 
 
-def split_exclusive_conjunctions(name, words, word_with_conjunction):
-    names = []
-
-    left = words[:words.index(word_with_conjunction)]
-    right = words[words.index(word_with_conjunction) + 1:]
+def split_exclusive_conjunctions(words, conjunction):
+    left = words[:words.index(conjunction)]
+    right = words[words.index(conjunction) + 1:]
     if len(left) > len(right):
-        names.append(' '.join(left))
+        return [' '.join(left)]
     elif len(right) > len(left):
-        names.append(' '.join(right))
-    else:
-        names += [' '.join(left), ' '.join(right)]
+        return [' '.join(right)]
 
-    return names or [name]
+    return [' '.join(left), ' '.join(right)]
 
 
-def split_additive_conjunctions(ingredient, words, word_with_conjunction):
-    left_name = ' '.join(words[:words.index(word_with_conjunction)])
-    right_name = ' '.join(words[words.index(word_with_conjunction) + 1:])
+def split_additive_conjunctions(ingredient, words, conjunction):
+    left_name = ' '.join(words[:words.index(conjunction)])
+    right_name = ' '.join(words[words.index(conjunction) + 1:])
     if ',' in left_name:
         _, primary_noun_index = get_closest_to_character(',', left_name, False, lambda char: char.isspace())
         right_name = left_name[primary_noun_index:left_name.index(',')] + ' ' + right_name
@@ -76,15 +74,16 @@ def get_closest_to_character(character, string, incrementing, condition=lambda c
 
 
 def is_conjunction_between_amount(conjunction, string):
-    words, word_with_conjunction = split_words_on_conjunction(conjunction, string)
-    word_with_conjunction_index = words.index(word_with_conjunction)
+    words = split_words_on_conjunction(conjunction, string)
+    conjunction_index = words.index(conjunction.strip())
 
-    return (words[word_with_conjunction_index - 1].isdigit()
-            or words[word_with_conjunction_index + word_with_conjunction_index < len(words) - 1].isdigit())
+    return (words[conjunction_index - 1].isdigit()
+            or words[conjunction_index + conjunction_index < len(words) - 1].isdigit())
 
 
-def split_words_on_conjunction(conjunction, string):
-    words = string.split(' ')
-    word_with_conjunction = [word for word in words if conjunction in word][0]
+def split_words_on_conjunction(contextual_conjunction, string):
+    return string.replace(contextual_conjunction, ' ' + contextual_conjunction + ' ').split(' ')
 
-    return words, word_with_conjunction
+
+def get_contextual_conjunction(conjunction):
+    return (' ' if len(conjunction) > 1 else '') + conjunction
