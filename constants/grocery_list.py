@@ -66,7 +66,10 @@ IRRELEVANT_WORDS = [
     'to drizzle',
     '%',
     'pure',
-    'of'
+    'of',
+    'smooth',
+    'block',
+    '.'
 ]
 
 UNITS = {

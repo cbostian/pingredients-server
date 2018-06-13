@@ -10,6 +10,7 @@ def sanitize_name(names):
 
 
 def remove_irrelevant_words(name):
+    name = filter(lambda char: not char.isdigit(), name)
     irrelevant_words_in_name = filter(lambda word: is_word_irrelevant_in_context(word, name),
                                       IRRELEVANT_WORDS + ALL_DERIVED_UNITS)
     while any(word in name for word in irrelevant_words_in_name) and irrelevant_words_in_name:
@@ -27,7 +28,6 @@ def remove_irrelevant_words(name):
 
         name = name.replace(to_remove, ' ')
 
-    name = filter(lambda char: not char.isdigit(), name)
     return name.strip()
 
 
@@ -35,14 +35,10 @@ def is_word_irrelevant_in_context(word, name):
     if word not in name:
         return False
 
-    preceding_char = ' '
-    succeeding_char = ' '
-    if name.index(word) > 0:
-        preceding_char = name[name.index(word) - 1]
-    if (name.index(word) + len(word)) < len(name):
-        succeeding_char = name[name.index(word) + len(word)]
+    preceding_char = name[name.index(word) - 1] if name.index(word) > 0 else ' '
+    succeeding_char = name[name.index(word) + len(word)] if (name.index(word) + len(word)) < len(name) else ' '
 
-    if word in ALL_DERIVED_UNITS:
+    if word in ALL_DERIVED_UNITS and len(word) == 1:
         return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
 
     return is_adjacent_char_irrelevant(preceding_char) or is_adjacent_char_irrelevant(succeeding_char)

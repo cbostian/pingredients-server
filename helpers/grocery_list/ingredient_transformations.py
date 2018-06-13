@@ -23,38 +23,87 @@ def transform_ingredients(pin):
 
 
 def transform_ingredient(ingredient):
-    name = ingredient['name']
-    amount = ingredient['amount'] or ''
+    name = prepare_for_amount_parsing(ingredient['name'])
+    amount = prepare_for_amount_parsing((ingredient['amount'] or '1.0'))
 
-    if not amount:
-        amount = name
+    amount_from_amount = get_number_from_string(amount)
+    amount_from_name = get_number_from_string(name)
 
-    string_with_unit = amount if any(unit in amount for unit in ALL_DERIVED_UNITS) else name
-
-    transformed_amount = max(get_number_from_string(amount), get_number_from_string(name))
-    transformed_unit, unit = derive_unit(string_with_unit)
-
-    if transformed_unit and string_with_unit == name:
-        if name.index(unit) > (len(name) / 2):
-            transformed_name = name[:name.index(unit)].strip()
-        else:
-            transformed_name = name[name.index(unit) + len(unit):].strip()
+    if amount_from_amount != 1 or amount_from_name == 1:
+        transformed_amount = amount_from_amount
+        transformed_unit = derive_unit(amount, transformed_amount)
     else:
-        transformed_name = name
+        transformed_amount = amount_from_name
+        transformed_unit = derive_unit(name, transformed_amount)
 
-    return split_conjunctions(dict(name=transformed_name, amount=transformed_amount, unit=transformed_unit))
+    return split_conjunctions(dict(name=name, amount=transformed_amount, unit=transformed_unit))
+
+
+def prepare_for_amount_parsing(string):
+    string = convert_fractions(string)
+    string = handle_ranges(string)
+    string = make_all_numbers_floats(string)
+    return string
+
+
+def handle_ranges(string):
+    string = string.replace('-', ' - ')
+    words = string.split(' ')
+    try:
+        range_index = words.index('-')
+        left = words[range_index - 1 if range_index > 0 else 0]
+        right = words[range_index + 1 if range_index < len(words) - 1 else 0]
+        if filter(lambda char: char.isdigit(), left) and filter(lambda char: char.isdigit(), right):
+            string = string.replace(left, '')
+            string = string.replace('-', '')
+        return string
+    except ValueError:
+        return string
+
+
+
+def make_all_numbers_floats(string):
+    all_numbers = find_all_numbers(string)
+    for number in all_numbers:
+        clean_number = filter(lambda char: char.isdigit(), number)
+        clean_number_indices = filter(lambda idx: not is_number_part_of_other_number(idx, clean_number, string),
+                                      [match.start() for match in re.finditer(clean_number, string)])
+        while bool(clean_number_indices):
+            index = clean_number_indices.pop(0)
+            string = string[:index] + str(float(clean_number)) + string[index + len(clean_number):]
+            clean_number_indices = filter(lambda idx: not is_number_part_of_other_number(idx, clean_number, string),
+                                          [match.start() for match in re.finditer(clean_number, string)])
+    return string
+
+
+def is_number_part_of_other_number(number_index, number, string):
+    is_preceding_part_of_number = False
+    is_succeeding_part_of_number = False
+
+    if number_index > 0:
+        is_preceding_part_of_number = string[number_index - 1].isdigit() or string[number_index - 1] == '.'
+
+    if number_index + len(number) < len(string):
+        is_succeeding_part_of_number = string[number_index + len(number)].isdigit() or (
+                string[number_index + len(number)] == '.' and (number_index + len(number)) < (len(string) - 1))
+
+    return is_preceding_part_of_number or is_succeeding_part_of_number
 
 
 def get_number_from_string(string):
-    return float(max((re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?",
-                                 convert_fractions(string.replace('-', ' '))) or [0.0])))
+    all_numbers = find_all_numbers(string)
+    return float(all_numbers[1] if float(all_numbers[0]) == 1 and len(all_numbers) > 1 else all_numbers[0])
+
+
+def find_all_numbers(string):
+    return re.findall(r"[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", string) or ['1.0']
 
 
 def convert_fractions(string_to_convert):
     fraction = ''.join(filter(lambda x: is_character_part_of_fraction(x, string_to_convert), string_to_convert)).strip()
-    if not fraction:
+    if not fraction or '/' not in string_to_convert:
         return string_to_convert
-    transformed_fraction = repr(float(sum(Fraction(num) for num in fraction.split())))
+    transformed_fraction = str(float(sum(Fraction(num) for num in fraction.split())))
     return convert_unicode_fractions(string_to_convert.replace(fraction, transformed_fraction))
 
 
@@ -71,16 +120,19 @@ def convert_unicode_fractions(string_to_convert):
     return str(string_to_convert)
 
 
-def derive_unit(string_with_unit):
-    min_unit_index = len(string_with_unit)
-    derived_unit = original_unit = ''
+def derive_unit(string_with_unit, amount):
+    words = string_with_unit.split(' ')
+    amount_index = 0
+    for index, word in enumerate(words):
+        if str(amount) in word:
+            amount_index = index
+
+    if amount_index == len(words) - 1:
+        return ''
+
     for unit, unit_properties in UNITS.items():
         for synonym in unit_properties['synonyms'] + [unit]:
-            if ' ' + synonym in string_with_unit:
-                unit_index = string_with_unit.index(' ' + synonym)
-                if unit_index < min_unit_index:
-                    derived_unit = unit
-                    original_unit = synonym
-                    min_unit_index = unit_index
+            if synonym in words[amount_index + 1]:
+                return unit
 
-    return derived_unit, original_unit
+    return ''
