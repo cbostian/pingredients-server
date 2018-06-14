@@ -2,7 +2,7 @@ import re
 import unicodedata
 
 from fractions import Fraction
-from constants.grocery_list import UNITS, ALL_DERIVED_UNITS
+from constants.grocery_list import IRRELEVANT_INGREDIENTS, UNITS
 from helpers.grocery_list.conjunction_parsing import split_conjunctions, is_conjunction_between_numbers
 
 
@@ -16,7 +16,8 @@ def transform_ingredients(pin):
     for ingredients in recipe['ingredients']:
         for ingredient in ingredients.get('ingredients', []):
             ingredients_dict.setdefault(ingredients['category'], [])
-            ingredients_dict[ingredients['category']] += transform_ingredient(ingredient)
+            if ingredient['name'].lower() not in IRRELEVANT_INGREDIENTS:
+                ingredients_dict[ingredients['category']] += transform_ingredient(ingredient)
 
     recipe['ingredients'] = ingredients_dict
     return pin
@@ -48,7 +49,7 @@ def prepare_for_amount_parsing(string):
 
 def handle_ranges(string):
     string = string.replace('-', ' - ')
-    words = string.split(' ')
+    words = string.split()
     try:
         range_index = words.index('-')
         left = words[range_index - 1 if range_index > 0 else 0]
@@ -59,7 +60,6 @@ def handle_ranges(string):
         return string
     except ValueError:
         return string
-
 
 
 def make_all_numbers_floats(string):
@@ -121,7 +121,7 @@ def convert_unicode_fractions(string_to_convert):
 
 
 def derive_unit(string_with_unit, amount):
-    words = string_with_unit.split(' ')
+    words = string_with_unit.split()
     amount_index = 0
     for index, word in enumerate(words):
         if str(amount) in word:

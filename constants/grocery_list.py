@@ -72,6 +72,12 @@ IRRELEVANT_WORDS = [
     '.'
 ]
 
+IRRELEVANT_INGREDIENTS = [
+    'n/a',
+    'water',
+    'ice water'
+]
+
 UNITS = {
     'oz': {
         'synonyms': ['ounce'],
@@ -86,7 +92,7 @@ UNITS = {
         'major_to_minor': {}
     },
     'cup': {
-        'synonyms': [],
+        'synonyms': ['c'],
         'major_to_minor': {}
     },
     'dash': {
