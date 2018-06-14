@@ -1,3 +1,4 @@
+import re
 from copy import deepcopy
 from difflib import SequenceMatcher
 
@@ -6,16 +7,14 @@ from constants.grocery_list import (IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIV
 
 
 def sanitize_name(names):
-    return get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names]))
+    return ' '.join(get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names])).split())
 
 
 def remove_irrelevant_words(name):
-    name = filter(lambda char: not char.isdigit(), name)
-    irrelevant_words_in_name = filter(lambda word: is_word_irrelevant_in_context(word, name),
-                                      IRRELEVANT_WORDS + ALL_DERIVED_UNITS)
-    while any(word in name for word in irrelevant_words_in_name) and irrelevant_words_in_name:
-        irrelevant_word = irrelevant_words_in_name.pop(0)
-
+    name = filter(lambda char: not (char.isdigit() or char in IRRELEVANT_WORDS), name)
+    irrelevant_words = get_all_irrelevant_words(name)
+    while any(word in name for word in irrelevant_words) and irrelevant_words:
+        irrelevant_word = irrelevant_words.pop(0)
         try:
             irrelevant_word_index = name.index(irrelevant_word)
         except ValueError:
@@ -31,13 +30,23 @@ def remove_irrelevant_words(name):
     return name.strip()
 
 
-def is_word_irrelevant_in_context(word, name):
-    if word not in name:
-        return False
+def get_all_irrelevant_words(name):
+    irrelevant_words_in_context = []
+    irrelevant_words = filter(lambda irrelevant_word: len(irrelevant_word) > 1, IRRELEVANT_WORDS) + ALL_DERIVED_UNITS
+    for word in irrelevant_words:
+        if word not in name:
+            continue
+        word_occurrences = [match.start() for match in re.finditer(re.escape(word), name)]
+        for index in word_occurrences:
+            preceding_char = name[index - 1] if index > 0 else ''
+            succeeding_char = name[index + len(word)] if (index + len(word)) < len(name) else ''
+            if is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
+                irrelevant_words_in_context.append(preceding_char + word + succeeding_char)
 
-    preceding_char = name[name.index(word) - 1] if name.index(word) > 0 else ' '
-    succeeding_char = name[name.index(word) + len(word)] if (name.index(word) + len(word)) < len(name) else ' '
+    return irrelevant_words_in_context
 
+
+def is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
     if word in ALL_DERIVED_UNITS and len(word) == 1:
         return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
 
@@ -45,7 +54,7 @@ def is_word_irrelevant_in_context(word, name):
 
 
 def is_adjacent_char_irrelevant(char):
-    return char.isspace() or char in IRRELEVANT_WORDS
+    return char.isspace() or char in IRRELEVANT_WORDS or not char
 
 
 def get_preferred_name(names):
@@ -61,8 +70,8 @@ def get_preferred_name(names):
 
     for name in names:
         for derived_name, preferred_name in derived_to_preferred_names.items():
-            match = SequenceMatcher(None, ''.join(sorted(name.lower().split(' '))),
-                                    ''.join(sorted(derived_name.lower().split(' ')))).ratio()
+            match = SequenceMatcher(None, ''.join(sorted(name.lower().split())),
+                                    ''.join(sorted(derived_name.lower().split()))).ratio()
             if match > max_match:
                 best_name = preferred_name
                 max_match = match

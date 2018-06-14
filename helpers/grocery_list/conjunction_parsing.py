@@ -82,7 +82,7 @@ def is_conjunction_between_amount(conjunction, string):
 
 
 def split_words_on_conjunction(contextual_conjunction, string):
-    return string.replace(contextual_conjunction, ' ' + contextual_conjunction + ' ').split(' ')
+    return string.replace(contextual_conjunction, ' ' + contextual_conjunction + ' ').split()
 
 
 def get_contextual_conjunction(conjunction):
