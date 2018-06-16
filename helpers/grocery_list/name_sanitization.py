@@ -21,9 +21,11 @@ def remove_irrelevant_words(name):
             continue
 
         to_remove = irrelevant_word
-        next_space_index = name.find(' ', irrelevant_word_index)
-        if next_space_index > 0 and len(irrelevant_word) > 1 and ' ' not in irrelevant_word:
-            to_remove = name[irrelevant_word_index:next_space_index]
+        if irrelevant_word[len(irrelevant_word) - 1] != ' ':
+            next_terminal_index = next_space_index = name.find(' ', irrelevant_word_index + 1)
+            if next_space_index < 0:
+                next_terminal_index = len(name) - 1
+            to_remove = name[irrelevant_word_index:next_terminal_index + 1]
 
         name = name.replace(to_remove, ' ')
 
@@ -33,22 +35,41 @@ def remove_irrelevant_words(name):
 def get_all_irrelevant_words(name):
     irrelevant_words_in_context = []
     irrelevant_words = filter(lambda irrelevant_word: len(irrelevant_word) > 1, IRRELEVANT_WORDS) + ALL_DERIVED_UNITS
-    for word in irrelevant_words:
-        if word not in name:
+    for phrase in irrelevant_words:
+        words = phrase.split()
+        if not is_phrase_in_word(words, name):
             continue
-        word_occurrences = [match.start() for match in re.finditer(re.escape(word), name)]
-        for index in word_occurrences:
-            preceding_char = name[index - 1] if index > 0 else ''
-            succeeding_char = name[index + len(word)] if (index + len(word)) < len(name) else ''
-            if is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
-                irrelevant_words_in_context.append(preceding_char + word + succeeding_char)
+        for word in words:
+            word_occurrences = [match.start() for match in re.finditer(re.escape(word), name)]
+            for index in word_occurrences:
+                preceding_char, succeeding_char = get_adjacent_characters(index, word, name)
+                if is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
+                    irrelevant_words_in_context.append(preceding_char + word + succeeding_char)
 
     return irrelevant_words_in_context
 
 
+def get_adjacent_characters(index, word, string_with_word):
+    preceding_char = string_with_word[index - 1] if index > 0 else ''
+    succeeding_char = string_with_word[index + len(word)] if (index + len(word)) < len(string_with_word) else ''
+    return preceding_char, succeeding_char
+
+
+def is_phrase_in_word(phrase, name):
+    for word in phrase:
+        if word not in name:
+            return False
+
+    return True
+
+
 def is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
-    if word in ALL_DERIVED_UNITS and len(word) == 1:
-        return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
+    if word in ALL_DERIVED_UNITS:
+        if len(word) == 1:
+            return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
+
+        return is_adjacent_char_irrelevant(preceding_char) and (is_adjacent_char_irrelevant(succeeding_char)
+                                                                or succeeding_char == 's')
 
     return is_adjacent_char_irrelevant(preceding_char) or is_adjacent_char_irrelevant(succeeding_char)
 

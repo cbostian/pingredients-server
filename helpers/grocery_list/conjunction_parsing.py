@@ -1,8 +1,9 @@
-from constants.grocery_list import ADDITIVE_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
+from constants.grocery_list import ADDITIVE_CONJUNCTIONS, CONDITIONAL_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
 from helpers.grocery_list.name_sanitization import sanitize_name
 
 
 def split_conjunctions(ingredient):
+    ingredient['name'] = remove_conditional_conjunctions(ingredient['name'])
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
         contextual_conjunction = get_contextual_conjunction(conjunction)
@@ -22,6 +23,23 @@ def split_conjunctions(ingredient):
                 ingredient['name'] = sanitize_name(split_exclusive_conjunctions(words, conjunction))
     ingredient['name'] = sanitize_name([ingredient['name']])
     return ingredients
+
+
+def remove_conditional_conjunctions(name):
+    for conditional_conjunction in CONDITIONAL_CONJUNCTIONS:
+        conditional_conjunction = ' ' + conditional_conjunction
+        if conditional_conjunction in name:
+            conditional_index = name.index(conditional_conjunction)
+            terminal_index = len(name)
+            for conjunction in filter(lambda c: len(c) > 1 , ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS):
+                contextual_conjunction = get_contextual_conjunction(conjunction)
+                if contextual_conjunction in name[conditional_index:]:
+                    conjunction_index = name.find(contextual_conjunction, conditional_index)
+                    if 0 <= conjunction_index < terminal_index:
+                        terminal_index = conjunction_index
+            name = name.replace(name[conditional_index:terminal_index], '')
+
+    return name
 
 
 def split_exclusive_conjunctions(words, conjunction):

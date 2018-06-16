@@ -1,12 +1,13 @@
 ADDITIVE_CONJUNCTIONS = ['and', '&']
 EXCLUSIVE_CONJUNCTIONS = ['or', '/']
+CONDITIONAL_CONJUNCTIONS = ['if']
 
 INGREDIENT_COMMON_ADJECTIVES = {
     'pepper': ['black', 'cracked'],
     'garlic': [],
     'chili flake': ['red'],
-    'pumpkin': ['canned'],
-    'flour': ['all-purpose'],
+    'pumpkin': [],
+    'flour': ['all purpose'],
     'salt': ['kosher'],
     'oil': ['olive', 'cooking'],
     'parmesan cheese': ['grated'],
@@ -27,6 +28,8 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'cinnamon': ['ground'],
     'chickpeas': ['canned'],
     'lentils': ['red'],
+    'maple': ['syrup'],
+    'coconut oil': ['virgin']
 }
 
 PREFERRED_NAME_OVERRIDES = {
@@ -35,7 +38,8 @@ PREFERRED_NAME_OVERRIDES = {
     'onion': 'yellow onion',
     'potato': 'russet potato',
     'cheese': 'cheddar cheese',
-    'shredded cheese': 'shredded cheddar cheese'
+    'shredded cheese': 'shredded cheddar cheese',
+    'maple': 'maple syrup'
 }
 
 IRRELEVANT_WORDS = [
@@ -47,8 +51,7 @@ IRRELEVANT_WORDS = [
     'optional',
     'peeled',
     'cut',
-    'pieces',
-    'into',
+    'into pieces',
     'with',
     'stems',
     'removed',
@@ -69,7 +72,10 @@ IRRELEVANT_WORDS = [
     'of',
     'smooth',
     'block',
-    '.'
+    '.',
+    'chopped',
+    'roasted',
+    'extra',
 ]
 
 IRRELEVANT_INGREDIENTS = [
@@ -126,7 +132,11 @@ UNITS = {
     'clove': {
         'synonyms': [],
         'major_to_minor': {}
-    }
+    },
+    'sheet': {
+        'synonyms': [],
+        'major_to_minor': {}
+    },
 }
 
 ALL_DERIVED_UNITS = []
