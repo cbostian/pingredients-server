@@ -2,8 +2,8 @@ import re
 from copy import deepcopy
 from difflib import SequenceMatcher
 
-from constants.grocery_list import (IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES, PREFERRED_NAME_OVERRIDES,
-                                    ALL_DERIVED_UNITS)
+from constants.grocery_list import (IRRELEVANT_PHRASES, IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES,
+                                    PREFERRED_NAME_OVERRIDES, ALL_DERIVED_UNITS)
 
 
 def sanitize_name(names):
@@ -11,6 +11,7 @@ def sanitize_name(names):
 
 
 def remove_irrelevant_words(name):
+    name = remove_irrelevant_phrases(name)
     name = filter(lambda char: not (char.isdigit() or char in IRRELEVANT_WORDS), name)
     irrelevant_words = get_all_irrelevant_words(name)
     while any(word in name for word in irrelevant_words) and irrelevant_words:
@@ -20,14 +21,10 @@ def remove_irrelevant_words(name):
         except ValueError:
             continue
 
-        to_remove = irrelevant_word
-        if irrelevant_word[len(irrelevant_word) - 1] != ' ':
-            next_terminal_index = next_space_index = name.find(' ', irrelevant_word_index + 1)
-            if next_space_index < 0:
-                next_terminal_index = len(name) - 1
-            to_remove = name[irrelevant_word_index:next_terminal_index + 1]
-
-        name = name.replace(to_remove, ' ')
+        next_terminal_index = next_space_index = name.find(' ', irrelevant_word_index + len(irrelevant_word))
+        if next_space_index < 0:
+            next_terminal_index = len(name) - 1
+        name = name.replace(name[irrelevant_word_index:next_terminal_index + 1], ' ')
 
     return name.strip()
 
@@ -39,12 +36,12 @@ def get_all_irrelevant_words(name):
         words = phrase.split()
         if not is_phrase_in_word(words, name):
             continue
-        for word in words:
-            word_occurrences = [match.start() for match in re.finditer(re.escape(word), name)]
-            for index in word_occurrences:
-                preceding_char, succeeding_char = get_adjacent_characters(index, word, name)
-                if is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
-                    irrelevant_words_in_context.append(preceding_char + word + succeeding_char)
+        to_remove = name[name.index(words[0]):name.index(words[len(words) - 1]) + len(words[len(words) - 1])]
+        occurrences = [match.start() for match in re.finditer(re.escape(to_remove), name)]
+        for index in occurrences:
+            preceding_char, succeeding_char = get_adjacent_characters(index, to_remove, name)
+            if is_word_irrelevant_in_context(to_remove, preceding_char, succeeding_char):
+                irrelevant_words_in_context.append((preceding_char + to_remove + succeeding_char).strip())
 
     return irrelevant_words_in_context
 
@@ -65,17 +62,22 @@ def is_phrase_in_word(phrase, name):
 
 def is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
     if word in ALL_DERIVED_UNITS:
-        if len(word) == 1:
-            return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
-
         return is_adjacent_char_irrelevant(preceding_char) and (is_adjacent_char_irrelevant(succeeding_char)
                                                                 or succeeding_char == 's')
 
-    return is_adjacent_char_irrelevant(preceding_char) or is_adjacent_char_irrelevant(succeeding_char)
+    return is_adjacent_char_irrelevant(preceding_char) and is_adjacent_char_irrelevant(succeeding_char)
 
 
 def is_adjacent_char_irrelevant(char):
     return char.isspace() or char in IRRELEVANT_WORDS or not char
+
+
+def remove_irrelevant_phrases(name):
+    for phrase in IRRELEVANT_PHRASES:
+        if phrase in name:
+            name = name[:name.index(phrase)]
+
+    return name
 
 
 def get_preferred_name(names):

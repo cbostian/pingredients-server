@@ -44,6 +44,7 @@ PREFERRED_NAME_OVERRIDES = {
 
 IRRELEVANT_WORDS = [
     'fresh',
+    'freshly',
     'small',
     'large',
     'medium',
@@ -76,12 +77,22 @@ IRRELEVANT_WORDS = [
     'chopped',
     'roasted',
     'extra',
+    'other',
+    'creamy',
+    'drippy',
+    'packed',
+    'roasted'
 ]
 
 IRRELEVANT_INGREDIENTS = [
     'n/a',
     'water',
-    'ice water'
+    'ice water',
+    ''
+]
+
+IRRELEVANT_PHRASES = [
+    'for the'
 ]
 
 UNITS = {
