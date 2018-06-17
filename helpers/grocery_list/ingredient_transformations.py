@@ -18,7 +18,10 @@ def transform_ingredients(pin):
         for ingredient in ingredients.get('ingredients', []):
             ingredients_dict.setdefault(ingredients['category'], [])
             if ingredient['name'].lower() not in IRRELEVANT_INGREDIENTS:
-                ingredients_dict[ingredients['category']] += transform_ingredient(ingredient)
+                transformed_ingredients = transform_ingredient(ingredient)
+                for transformed_ingredient in transformed_ingredients:
+                    if transformed_ingredient['name'].lower() not in IRRELEVANT_INGREDIENTS:
+                        ingredients_dict[ingredients['category']].append(transformed_ingredient)
 
     recipe['ingredients'] = ingredients_dict
     return pin
