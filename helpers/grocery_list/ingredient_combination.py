@@ -64,10 +64,10 @@ def return_and_remove_ingredient_from_category(name, category):
 
 
 def convert_major_units_to_minor(ingredient):
-    if not UNITS.get(ingredient['unit'], {}).get('major_to_minor'):
+    if not UNITS.get(ingredient['unit'], {}).get('conversion'):
         return
 
-    ingredient['amount'] *= UNITS[ingredient['unit']]['major_to_minor']['ratio']
-    ingredient['unit'] = UNITS[ingredient['unit']]['major_to_minor']['unit']
+    ingredient['amount'] *= UNITS[ingredient['unit']]['conversion']['ratio']
+    ingredient['unit'] = UNITS[ingredient['unit']]['conversion']['unit']
 
     convert_major_units_to_minor(ingredient)
