@@ -41,8 +41,6 @@ def transform_ingredient(ingredient):
         transformed_amount = amount_from_name
         transformed_unit = derive_unit(name, transformed_amount)
 
-    if 'coconut' in name.lower() and 'milk' in name.lower():
-        print transformed_unit
     return split_conjunctions(dict(name=name, amount=transformed_amount, unit=transformed_unit))
 
 
