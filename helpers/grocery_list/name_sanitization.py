@@ -3,7 +3,7 @@ from copy import deepcopy
 from difflib import SequenceMatcher
 
 from constants.grocery_list import (IRRELEVANT_PHRASES, IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES,
-                                    PREFERRED_NAME_OVERRIDES, ALL_DERIVED_UNITS)
+                                    INGREDIENT_SYNONYMS, PREFERRED_NAME_OVERRIDES, ALL_DERIVED_UNITS)
 
 
 def sanitize_name(names):
@@ -98,5 +98,5 @@ def get_preferred_name(names):
             if match > max_match:
                 best_name = preferred_name
                 max_match = match
-    return best_name
+    return INGREDIENT_SYNONYMS.get(best_name, best_name)
 

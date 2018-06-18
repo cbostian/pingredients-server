@@ -4,9 +4,7 @@ CONDITIONAL_CONJUNCTIONS = ['if']
 
 INGREDIENT_COMMON_ADJECTIVES = {
     'pepper': ['black', 'cracked'],
-    'garlic': [],
     'chili flake': ['red'],
-    'pumpkin': [],
     'flour': ['all purpose'],
     'salt': ['kosher'],
     'oil': ['olive', 'cooking'],
@@ -14,7 +12,6 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'kale': ['leaves'],
     'onion': ['yellow'],
     'broth': ['vegetable'],
-    'curry powder': [],
     'paprika': ['smoked', 'ground'],
     'cumin': ['ground', 'powder'],
     'egg': ['yolk', 'white'],
@@ -30,6 +27,11 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'lentils': ['red'],
     'maple': ['syrup'],
     'coconut oil': ['virgin']
+}
+
+INGREDIENT_SYNONYMS = {
+    'coriander': 'cilantro',
+    'confectioners sugar': 'powdered sugar'
 }
 
 PREFERRED_NAME_OVERRIDES = {
@@ -81,13 +83,15 @@ IRRELEVANT_WORDS = [
     'creamy',
     'drippy',
     'packed',
-    'roasted'
+    'roasted',
+    'thai'
 ]
 
 IRRELEVANT_INGREDIENTS = [
     'n/a',
     'water',
     'ice water',
+    'topping',
     ''
 ]
 
@@ -98,55 +102,55 @@ IRRELEVANT_PHRASES = [
 UNITS = {
     'oz': {
         'synonyms': ['ounce'],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'lb': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'tsp': {
         'synonyms': ['teaspoon'],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'cup': {
         'synonyms': ['c'],
-        'major_to_minor': {}
+        'conversion': {'unit': 'tbsp', 'ratio': 16.0}
     },
     'dash': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {'unit': 'tsp', 'ratio': 1.0 / 8.0}
     },
     'jar': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'tbsp': {
         'synonyms': ['tablespoon'],
-        'major_to_minor': {'unit': 'tsp', 'ratio': 3.0}
+        'conversion': {'unit': 'tsp', 'ratio': 3.0}
     },
     'ml': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'g': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'head': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'can': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {'unit': 'oz', 'ratio': 14.0}
     },
     'clove': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
     'sheet': {
         'synonyms': [],
-        'major_to_minor': {}
+        'conversion': {}
     },
 }
 

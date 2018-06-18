@@ -41,6 +41,8 @@ def transform_ingredient(ingredient):
         transformed_amount = amount_from_name
         transformed_unit = derive_unit(name, transformed_amount)
 
+    if 'coconut' in name.lower() and 'milk' in name.lower():
+        print transformed_unit
     return split_conjunctions(dict(name=name, amount=transformed_amount, unit=transformed_unit))
 
 
@@ -136,9 +138,9 @@ def derive_unit(string_with_unit, amount):
 
     for unit, unit_properties in UNITS.items():
         for synonym in unit_properties['synonyms'] + [unit]:
-            for word in words[amount_index + 1:]:
+            for word in words[amount_index:]:
                 if synonym in word:
-                    preceding_char, succeeding_char = get_adjacent_characters(word.index(synonym), word, word)
+                    preceding_char, succeeding_char = get_adjacent_characters(word.index(synonym), synonym, word)
                     if is_word_irrelevant_in_context(synonym, preceding_char, succeeding_char):
                         return unit
 
