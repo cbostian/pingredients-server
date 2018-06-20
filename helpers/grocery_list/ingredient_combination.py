@@ -1,4 +1,6 @@
-from constants.grocery_list import UNITS
+from fractions import Fraction
+
+from constants.grocery_list import UNITS, MINOR_TO_MAJOR_CONVERSIONS
 
 
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list):
@@ -7,11 +9,16 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
             if not ingredient['unit'] or not ingredient_to_compare['unit']:
                 ingredient['unit'] = ingredient_to_compare['unit'] = ingredient['unit'] or ingredient_to_compare['unit']
 
-            convert_major_units_to_minor(ingredient_to_compare)
-            convert_major_units_to_minor(ingredient)
+            converted = False
+            if ingredient['unit'] != ingredient_to_compare['unit']:
+                convert_units(ingredient_to_compare)
+                convert_units(ingredient)
+                converted = True
 
             if ingredient['unit'] == ingredient_to_compare['unit']:
-                ingredient['amount'] += ingredient_to_compare['amount']
+                ingredient['amount'] = str(Fraction(ingredient_to_compare['amount']) + Fraction(ingredient['amount']))
+                if converted:
+                    convert_units(ingredient, False)
                 return
 
     grocery_list.setdefault(category, []).append(ingredient_to_compare)
@@ -63,11 +70,17 @@ def return_and_remove_ingredient_from_category(name, category):
             return ingredient
 
 
-def convert_major_units_to_minor(ingredient):
-    if not UNITS.get(ingredient['unit'], {}).get('conversion'):
+def convert_units(ingredient, major_to_minor=True):
+    if major_to_minor:
+        conversion_scale = UNITS
+    else:
+        conversion_scale = MINOR_TO_MAJOR_CONVERSIONS
+
+    if not conversion_scale.get(ingredient['unit'], {}).get('conversion'):
         return
 
-    ingredient['amount'] *= UNITS[ingredient['unit']]['conversion']['ratio']
-    ingredient['unit'] = UNITS[ingredient['unit']]['conversion']['unit']
+    ingredient['amount'] = str(Fraction(ingredient['amount']) *
+                               conversion_scale[ingredient['unit']]['conversion']['ratio'])
+    ingredient['unit'] = conversion_scale[ingredient['unit']]['conversion']['unit']
 
-    convert_major_units_to_minor(ingredient)
+    convert_units(ingredient, major_to_minor)

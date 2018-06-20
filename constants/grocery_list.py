@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 ADDITIVE_CONJUNCTIONS = ['and', '&']
 EXCLUSIVE_CONJUNCTIONS = ['or', '/']
 CONDITIONAL_CONJUNCTIONS = ['if']
@@ -114,11 +116,11 @@ UNITS = {
     },
     'cup': {
         'synonyms': ['c'],
-        'conversion': {'unit': 'tbsp', 'ratio': 16.0}
+        'conversion': {'unit': 'tbsp', 'ratio': 16}
     },
     'dash': {
         'synonyms': [],
-        'conversion': {'unit': 'tsp', 'ratio': 1.0 / 8.0}
+        'conversion': {'unit': 'tsp', 'ratio': Fraction(1, 8)}
     },
     'jar': {
         'synonyms': [],
@@ -126,7 +128,7 @@ UNITS = {
     },
     'tbsp': {
         'synonyms': ['tablespoon'],
-        'conversion': {'unit': 'tsp', 'ratio': 3.0}
+        'conversion': {'unit': 'tsp', 'ratio': 3}
     },
     'ml': {
         'synonyms': [],
@@ -142,7 +144,7 @@ UNITS = {
     },
     'can': {
         'synonyms': [],
-        'conversion': {'unit': 'oz', 'ratio': 14.0}
+        'conversion': {'unit': 'oz', 'ratio': 14}
     },
     'clove': {
         'synonyms': [],
@@ -157,4 +159,16 @@ UNITS = {
 ALL_DERIVED_UNITS = []
 for unit, unit_properties in UNITS.items():
     ALL_DERIVED_UNITS += [unit] + unit_properties['synonyms']
+
+IGNORED_MINOR_TO_MAJOR = ['dash']
+
+MINOR_TO_MAJOR_CONVERSIONS = {}
+for unit, unit_properties in UNITS.items():
+    if unit_properties['conversion'] and unit not in IGNORED_MINOR_TO_MAJOR:
+        MINOR_TO_MAJOR_CONVERSIONS[unit_properties['conversion']['unit']] = {
+            'conversion': {
+                'unit': unit,
+                'ratio': Fraction(1, unit_properties['conversion']['ratio'])
+            }
+        }
 
