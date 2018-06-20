@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 from constants.grocery_list import ADDITIVE_CONJUNCTIONS, CONDITIONAL_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
 from helpers.grocery_list.name_sanitization import sanitize_name
 
@@ -63,7 +65,7 @@ def split_additive_conjunctions(ingredient, words, conjunction):
         _, primary_noun_index = get_closest_to_character(', ', right_name, True, lambda char: char.isspace())
         left_name += ' ' + right_name[right_name.index(', ') + 2:primary_noun_index + 1]
 
-    halved_amount = ingredient['amount'] / 2
+    halved_amount = str(Fraction(ingredient['amount']) / 2)
     ingredient['amount'] = halved_amount
     ingredient['name'] = sanitize_name([left_name])
 
