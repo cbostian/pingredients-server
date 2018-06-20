@@ -86,7 +86,8 @@ IRRELEVANT_WORDS = [
     'drippy',
     'packed',
     'roasted',
-    'thai'
+    'thai',
+    '/'
 ]
 
 IRRELEVANT_INGREDIENTS = [
