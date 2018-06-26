@@ -26,7 +26,8 @@ def remove_irrelevant_words(name):
             next_terminal_index = len(name) - 1
         name = name.replace(name[irrelevant_word_index:next_terminal_index + 1], ' ')
 
-    return name.strip()
+    unique_words = set()
+    return ' '.join([w for w in name.split() if not (w in unique_words or unique_words.add(w))])
 
 
 def get_all_irrelevant_words(name):

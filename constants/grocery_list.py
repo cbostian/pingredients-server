@@ -3,6 +3,7 @@ from fractions import Fraction
 ADDITIVE_CONJUNCTIONS = ['and', '&']
 EXCLUSIVE_CONJUNCTIONS = ['or', '/']
 CONDITIONAL_CONJUNCTIONS = ['if']
+IGNORED_CONJUNCTION_INGREDIENTS = ['half']
 
 INGREDIENT_COMMON_ADJECTIVES = {
     'pepper': ['black', 'cracked'],
@@ -23,17 +24,19 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'heavy cream': ['whipping'],
     'coconut milk': ['full fat'],
     'cilantro': ['leaves'],
-    'coriander': ['ground'],
     'cinnamon': ['ground'],
     'chickpeas': ['canned'],
     'lentils': ['red'],
     'maple': ['syrup'],
-    'coconut oil': ['virgin']
+    'jalapeno': ['pepper'],
+    'coconut oil': ['virigin'],
+    'olive oil': ['virigin']
 }
 
 INGREDIENT_SYNONYMS = {
     'coriander': 'cilantro',
-    'confectioners sugar': 'powdered sugar'
+    'confectioners sugar': 'powdered sugar',
+    'coriander ground': 'coriander powder'
 }
 
 PREFERRED_NAME_OVERRIDES = {
@@ -57,7 +60,6 @@ IRRELEVANT_WORDS = [
     'peeled',
     'cut',
     'into pieces',
-    'with',
     'stems',
     'removed',
     'super',
@@ -87,7 +89,15 @@ IRRELEVANT_WORDS = [
     'packed',
     'roasted',
     'thai',
-    '/'
+    '/',
+    'flaky',
+    'head',
+    'thawed',
+    'defrost',
+    'minced',
+    'hard',
+    'soft',
+    'boil in bag'
 ]
 
 IRRELEVANT_INGREDIENTS = [
@@ -139,10 +149,6 @@ UNITS = {
         'synonyms': [],
         'conversion': {}
     },
-    'head': {
-        'synonyms': [],
-        'conversion': {}
-    },
     'can': {
         'synonyms': [],
         'conversion': {'unit': 'oz', 'ratio': 14}
@@ -161,7 +167,7 @@ ALL_DERIVED_UNITS = []
 for unit, unit_properties in UNITS.items():
     ALL_DERIVED_UNITS += [unit] + unit_properties['synonyms']
 
-IGNORED_MINOR_TO_MAJOR = ['dash']
+IGNORED_MINOR_TO_MAJOR = ['dash', 'can']
 
 MINOR_TO_MAJOR_CONVERSIONS = {}
 for unit, unit_properties in UNITS.items():
@@ -172,4 +178,13 @@ for unit, unit_properties in UNITS.items():
                 'ratio': Fraction(1, unit_properties['conversion']['ratio'])
             }
         }
+
+DEFAULT_UNITS = {
+    'garlic': 'clove',
+    'cauliflower': 'head',
+    'salt': 'tsp',
+    'pepper': 'tsp',
+    'olive oil': 'tbsp',
+    'sea salt': 'tsp'
+}
 
