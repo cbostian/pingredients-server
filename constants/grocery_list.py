@@ -178,13 +178,3 @@ for unit, unit_properties in UNITS.items():
                 'ratio': Fraction(1, unit_properties['conversion']['ratio'])
             }
         }
-
-DEFAULT_UNITS = {
-    'garlic': 'clove',
-    'cauliflower': 'head',
-    'salt': 'tsp',
-    'pepper': 'tsp',
-    'olive oil': 'tbsp',
-    'sea salt': 'tsp'
-}
-
