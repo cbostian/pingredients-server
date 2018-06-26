@@ -1,6 +1,7 @@
 from fractions import Fraction
 
-from constants.grocery_list import ADDITIVE_CONJUNCTIONS, CONDITIONAL_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS, UNITS
+from constants.grocery_list import (ADDITIVE_CONJUNCTIONS, CONDITIONAL_CONJUNCTIONS, EXCLUSIVE_CONJUNCTIONS,
+                                    IGNORED_CONJUNCTION_INGREDIENTS, UNITS)
 from helpers.grocery_list.name_sanitization import sanitize_name
 
 
@@ -15,7 +16,9 @@ def split_conjunctions(ingredient):
 
         words = split_words_on_conjunction(contextual_conjunction, ingredient['name'])
         if conjunction in ADDITIVE_CONJUNCTIONS:
-            ingredients.append(split_additive_conjunctions(ingredient, words, conjunction))
+            split_ingredient = split_additive_conjunctions(ingredient, words, conjunction)
+            if split_ingredient:
+                ingredients.append(split_ingredient)
         else:
             if is_conjunction_between_amount(conjunction, ingredient['name']):
                 for word in words:
@@ -23,6 +26,7 @@ def split_conjunctions(ingredient):
                         ingredient['name'] = ingredient['name'].replace(word, '')
             else:
                 ingredient['name'] = sanitize_name(split_exclusive_conjunctions(words, conjunction))
+
     ingredient['name'] = sanitize_name([ingredient['name']])
     return ingredients
 
@@ -65,13 +69,22 @@ def split_additive_conjunctions(ingredient, words, conjunction):
         _, primary_noun_index = get_closest_to_character(', ', right_name, True, lambda char: char.isspace())
         left_name += ' ' + right_name[right_name.index(', ') + 2:primary_noun_index + 1]
 
+    left_name = sanitize_name([left_name])
+    right_name = sanitize_name([right_name])
+    if left_name and right_name in IGNORED_CONJUNCTION_INGREDIENTS:
+        ingredient['name'] = sanitize_name([ingredient['name']])
+        return
+    if left_name == right_name:
+        ingredient['name'] = left_name
+        return
+
     halved_amount = str(Fraction(ingredient['amount']) / 2)
     ingredient['amount'] = halved_amount
-    ingredient['name'] = sanitize_name([left_name])
+    ingredient['name'] = left_name
 
     return {
         'amount': halved_amount,
-        'name': sanitize_name([right_name]),
+        'name': right_name,
         'unit': ingredient['unit']
     }
 
