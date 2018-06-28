@@ -10,11 +10,17 @@ def test_grocery_list():
 
 
 def compare_groceries(expected_grocery_list, actual_grocery_list):
+    name_counts = {}
     for expected_category, expected_ingredients in expected_grocery_list.items():
         for expected_ingredient in expected_ingredients:
             match = False
+            if expected_ingredient['name'] in name_counts:
+                name_counts[expected_ingredient['name']] += 1
+            else:
+                name_counts[expected_ingredient['name']] = 1
+
             for actual_ingredient in actual_grocery_list[expected_category]:
-                if (actual_ingredient['name'] ==  expected_ingredient['name'] and
+                if (actual_ingredient['name'] == expected_ingredient['name'] and
                         actual_ingredient['amount'] == expected_ingredient['amount'] and
                         actual_ingredient['unit'] == expected_ingredient['unit']):
                     match = True
@@ -22,6 +28,9 @@ def compare_groceries(expected_grocery_list, actual_grocery_list):
             if not match:
                 print expected_ingredient
             assert match
+    for name, count in name_counts.items():
+        if count > 1:
+            print name
 
 
 all_recipes = requests.get('http://localhost:8080/recipes', headers={'oauth_token': '123', 'user_id': 'dev_user_id'}).json()['data']

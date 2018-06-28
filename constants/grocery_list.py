@@ -12,7 +12,6 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'salt': ['kosher'],
     'oil': ['olive', 'cooking'],
     'parmesan cheese': ['grated'],
-    'kale': ['leaves'],
     'onion': ['yellow'],
     'broth': ['vegetable'],
     'paprika': ['smoked', 'ground'],
@@ -60,8 +59,7 @@ IRRELEVANT_WORDS = [
     'peeled',
     'cut',
     'into pieces',
-    'stems',
-    'removed',
+    'with stems removed',
     'super',
     'firm',
     'cooked',
@@ -161,6 +159,10 @@ UNITS = {
         'synonyms': [],
         'conversion': {}
     },
+    'leaves': {
+        'synonyms': [],
+        'conversion': {}
+    }
 }
 
 ALL_DERIVED_UNITS = []
@@ -173,6 +175,75 @@ MINOR_TO_MAJOR_CONVERSIONS = {}
 for unit, unit_properties in UNITS.items():
     if unit_properties['conversion'] and unit not in IGNORED_MINOR_TO_MAJOR:
         MINOR_TO_MAJOR_CONVERSIONS[unit_properties['conversion']['unit']] = {
+            'conversion': {
+                'unit': unit,
+                'ratio': Fraction(1, unit_properties['conversion']['ratio'])
+            }
+        }
+
+MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
+    'butter': {
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(19, 4)}
+        },
+    },
+    'flour': {
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(10, 3)}
+        },
+    },
+    'coconut milk': {
+        'oz': {
+            'conversion': {'unit': 'cup', 'ratio': Fraction(1, 8)}
+        },
+    },
+    'kale': {
+        'leaves': {
+            'conversion': {'unit': 'cup', 'ratio': 1}
+        }
+    },
+    'cilantro': {
+        'cup': {
+            'conversion': {'unit': 'leaves', 'ratio': 1}
+        },
+    },
+    'basil': {
+        'cup': {
+            'conversion': {'unit': '', 'ratio': 1}
+        }
+    },
+    'carrots': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': Fraction(1, 3)}
+        }
+    },
+    'yellow onion': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': 1}
+        }
+    },
+    'garlic': {
+        'clove': {
+            'conversion': {'unit': 'tsp', 'ratio': 1}
+        }
+    },
+    'lemon juice': {
+        'tbsp': {
+            'conversion': {'unit': '', 'ratio': Fraction(1, 2)}
+        }
+    },
+    'lemon zest': {
+        'tsp': {
+            'conversion': {'unit': '', 'ratio': Fraction(1, 3)}
+        }
+    }
+}
+
+MINOR_VOLUME_WEIGHT_CONVERSIONS = {}
+for ingredient, conversions in MAJOR_VOLUME_WEIGHT_CONVERSIONS.items():
+    MINOR_VOLUME_WEIGHT_CONVERSIONS[ingredient] = {}
+    for unit, unit_properties in conversions.items():
+        MINOR_VOLUME_WEIGHT_CONVERSIONS[ingredient][unit_properties['conversion']['unit']] = {
             'conversion': {
                 'unit': unit,
                 'ratio': Fraction(1, unit_properties['conversion']['ratio'])
