@@ -1,7 +1,8 @@
 from copy import deepcopy
 from fractions import Fraction
 
-from constants.grocery_list import UNITS, MINOR_TO_MAJOR_CONVERSIONS
+from constants.grocery_list import (UNITS, MINOR_TO_MAJOR_CONVERSIONS, MINOR_VOLUME_WEIGHT_CONVERSIONS,
+                                    MAJOR_VOLUME_WEIGHT_CONVERSIONS)
 
 
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list, default_units):
@@ -18,7 +19,6 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
                 convert_units(ingredient)
                 converted = (ingredient['unit'] != original_unit) or (ingredient_to_compare['unit']
                                                                       != original_compare_unit)
-
             if ingredient['unit'] == ingredient_to_compare['unit']:
                 ingredient['amount'] = str(Fraction(ingredient_to_compare['amount']) + Fraction(ingredient['amount']))
                 if converted:
@@ -86,7 +86,7 @@ def get_default_units(grocery_list):
 
     for name, units in unit_occurrences.items():
         if len(units.keys()) > 1:
-            max_unit = units.keys()[0]
+            max_unit = sorted(units.keys())[0]
             for unit, occurrences in units.items():
                 if occurrences > units[max_unit]:
                     max_unit = unit
@@ -96,9 +96,13 @@ def get_default_units(grocery_list):
 
 def convert_units(ingredient, major_to_minor=True):
     if major_to_minor:
-        conversion_scale = UNITS
+        conversion_scale = deepcopy(UNITS)
+        weight_scale = MAJOR_VOLUME_WEIGHT_CONVERSIONS
     else:
-        conversion_scale = MINOR_TO_MAJOR_CONVERSIONS
+        conversion_scale = deepcopy(MINOR_TO_MAJOR_CONVERSIONS)
+        weight_scale = MINOR_VOLUME_WEIGHT_CONVERSIONS
+
+    conversion_scale.update(weight_scale.get(ingredient['name'], {}))
 
     if not conversion_scale.get(ingredient['unit'], {}).get('conversion'):
         return

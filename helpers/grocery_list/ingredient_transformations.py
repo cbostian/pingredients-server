@@ -33,7 +33,10 @@ def transform_ingredient(ingredient):
 
     if amount_from_amount != '1' or amount_from_name == '1':
         transformed_amount = amount_from_amount
-        transformed_unit = derive_unit(amount, transformed_amount)
+        if any(char.isalpha() for char in amount):
+            transformed_unit = derive_unit(amount, transformed_amount)
+        else:
+            transformed_unit = derive_unit(name, amount_from_name)
     else:
         transformed_amount = amount_from_name
         transformed_unit = derive_unit(name, transformed_amount)

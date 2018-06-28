@@ -1,9 +1,9 @@
 EXPECTED_GROCERY_LIST = {
   "Baking & Spices": [
     {
-      "amount": "300",
+      "amount": "1775/96",
       "name": "flour",
-      "unit": "g"
+      "unit": "cup"
     },
     {
       "amount": "193/16",
@@ -34,11 +34,6 @@ EXPECTED_GROCERY_LIST = {
       "amount": "7/4",
       "name": "sea salt",
       "unit": "tsp"
-    },
-    {
-      "amount": "1595/96",
-      "name": "flour",
-      "unit": "cup"
     },
     {
       "amount": "1/4",
@@ -222,12 +217,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/2",
-      "name": "coconut milk",
-      "unit": "cup"
-    },
-    {
-      "amount": "42",
+      "amount": "46",
       "name": "coconut milk",
       "unit": "oz"
     },
@@ -321,7 +311,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": ""
     },
     {
-      "amount": "97/16",
+      "amount": "1923/304",
       "name": "butter",
       "unit": "cup"
     },
@@ -329,11 +319,6 @@ EXPECTED_GROCERY_LIST = {
       "amount": "17/16",
       "name": "heavy cream",
       "unit": "cup"
-    },
-    {
-      "amount": "60",
-      "name": "butter",
-      "unit": "g"
     },
     {
       "amount": "100",
@@ -492,7 +477,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tsp"
     },
     {
-      "amount": "27",
+      "amount": "28",
       "name": "garlic",
       "unit": "clove"
     },
@@ -507,24 +492,14 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "4",
-      "name": "carrots",
-      "unit": "cup"
-    },
-    {
-      "amount": "1",
-      "name": "garlic",
-      "unit": "tsp"
-    },
-    {
       "amount": "5/24",
       "name": "garlic powder",
       "unit": "cup"
     },
     {
-      "amount": "8",
+      "amount": "10",
       "name": "kale",
-      "unit": ""
+      "unit": "leaves"
     },
     {
       "amount": "3/4",
@@ -532,9 +507,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/2",
+      "amount": "1/24",
       "name": "lemon zest",
-      "unit": "tsp"
+      "unit": "cup"
     },
     {
       "amount": "8",
@@ -567,12 +542,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tbsp"
     },
     {
-      "amount": "1",
-      "name": "basil",
-      "unit": ""
-    },
-    {
-      "amount": "7",
+      "amount": "19",
       "name": "carrots",
       "unit": ""
     },
@@ -622,19 +592,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "5/4",
-      "name": "yellow onion",
-      "unit": "cup"
-    },
-    {
       "amount": "1/2",
       "name": "chilli red",
       "unit": "tsp"
-    },
-    {
-      "amount": "1",
-      "name": "cilantro",
-      "unit": ""
     },
     {
       "amount": "1/2",
@@ -643,8 +603,8 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "2",
-      "name": "kaffir lime leaves",
-      "unit": ""
+      "name": "kaffir lime",
+      "unit": "leaves"
     },
     {
       "amount": "1",
@@ -657,7 +617,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "3",
+      "amount": "17/4",
       "name": "yellow onion",
       "unit": ""
     },
@@ -672,16 +632,6 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/2",
-      "name": "lemon zest",
-      "unit": ""
-    },
-    {
-      "amount": "1/2",
-      "name": "lemon juice",
-      "unit": ""
-    },
-    {
       "amount": "9/4",
       "name": "lentils",
       "unit": "cup"
@@ -692,7 +642,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": ""
     },
     {
-      "amount": "1/4",
+      "amount": "5/4",
       "name": "basil",
       "unit": "cup"
     },
@@ -700,11 +650,6 @@ EXPECTED_GROCERY_LIST = {
       "amount": "10",
       "name": "sun dried tomatoes",
       "unit": ""
-    },
-    {
-      "amount": "2",
-      "name": "kale",
-      "unit": "cup"
     },
     {
       "amount": "3",
@@ -752,7 +697,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/2",
+      "amount": "3/2",
       "name": "cilantro",
       "unit": "cup"
     },
@@ -792,7 +737,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/4",
+      "amount": "5/16",
       "name": "lemon juice",
       "unit": "cup"
     },
