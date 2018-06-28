@@ -2,8 +2,9 @@ import re
 from copy import deepcopy
 from difflib import SequenceMatcher
 
-from constants.grocery_list import (IRRELEVANT_PHRASES, IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES,
-                                    INGREDIENT_SYNONYMS, PREFERRED_NAME_OVERRIDES, ALL_DERIVED_UNITS)
+from constants.grocery_list import (IGNORED_CONJUNCTION_INGREDIENTS, IRRELEVANT_PHRASES, IRRELEVANT_WORDS,
+                                    INGREDIENT_COMMON_ADJECTIVES, INGREDIENT_SYNONYMS, PREFERRED_NAME_OVERRIDES,
+                                    ALL_DERIVED_UNITS)
 
 
 def sanitize_name(names):
@@ -27,7 +28,8 @@ def remove_irrelevant_words(name):
         name = name.replace(name[irrelevant_word_index:next_terminal_index + 1], ' ')
 
     unique_words = set()
-    return ' '.join([w for w in name.split() if not (w in unique_words or unique_words.add(w))])
+    return ' '.join([w for w in name.split() if not (w in unique_words or unique_words.add(w))
+                     or w in IGNORED_CONJUNCTION_INGREDIENTS])
 
 
 def get_all_irrelevant_words(name):

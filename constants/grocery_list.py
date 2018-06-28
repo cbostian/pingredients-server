@@ -92,7 +92,7 @@ IRRELEVANT_WORDS = [
     'head',
     'thawed',
     'defrost',
-    'minced',
+    'finely minced to',
     'hard',
     'soft',
     'boil in bag'

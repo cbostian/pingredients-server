@@ -24,7 +24,7 @@ VULGAR_FRACTIONS = {
 
 
 def convert_unicode_fractions(string_to_convert):
-    unicode_string = string_to_convert.decode('unicode-escape')
+    unicode_string = string_to_convert.encode('ascii', 'ignore').decode('unicode-escape')
     unicode_fraction = filter(lambda x: unicodedata.name(x).startswith(VF), unicode_string)
     if unicode_fraction:
         string_to_convert = unicode_string.replace(unicode_fraction, str(VULGAR_FRACTIONS[unicode_fraction]))
