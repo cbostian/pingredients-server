@@ -3,6 +3,7 @@ from fractions import Fraction
 
 from constants.grocery_list import (UNITS, MINOR_TO_MAJOR_CONVERSIONS, MINOR_VOLUME_WEIGHT_CONVERSIONS,
                                     MAJOR_VOLUME_WEIGHT_CONVERSIONS)
+from helpers.grocery_list.fraction_parsing import set_display_amount
 
 
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list, default_units):
@@ -23,10 +24,13 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
                 ingredient['amount'] = str(Fraction(ingredient_to_compare['amount']) + Fraction(ingredient['amount']))
                 if converted:
                     convert_units(ingredient, False)
+                set_display_amount(ingredient)
                 return
             elif converted:
                 convert_units(ingredient, False)
+                set_display_amount(ingredient)
 
+    set_display_amount(original_ingredient_to_compare)
     grocery_list.setdefault(category, []).append(original_ingredient_to_compare)
 
 
@@ -107,8 +111,12 @@ def convert_units(ingredient, major_to_minor=True):
     if not conversion_scale.get(ingredient['unit'], {}).get('conversion'):
         return
 
-    ingredient['amount'] = str(Fraction(ingredient['amount']) *
-                               conversion_scale[ingredient['unit']]['conversion']['ratio'])
+    converted_amount = Fraction(ingredient['amount']) * conversion_scale[ingredient['unit']]['conversion']['ratio']
+    if (not major_to_minor and converted_amount.denominator > 8
+            and converted_amount.denominator > converted_amount.numerator):
+        return
+
+    ingredient['amount'] = str(converted_amount)
     ingredient['unit'] = conversion_scale[ingredient['unit']]['conversion']['unit']
 
     convert_units(ingredient, major_to_minor)
