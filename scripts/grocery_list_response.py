@@ -21,14 +21,14 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tsp"
     },
     {
-      "amount": "13/48",
+      "amount": "13/3",
       "name": "curry powder",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
-      "amount": "7/48",
+      "amount": "7/3",
       "name": "paprika",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "7/4",
@@ -61,9 +61,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "13/384",
+      "amount": "13/8",
       "name": "cinnamon",
-      "unit": "cup"
+      "unit": "tsp"
     },
     {
       "amount": "1",
@@ -81,9 +81,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": ""
     },
     {
-      "amount": "19/64",
+      "amount": "19/4",
       "name": "baking soda",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "1",
@@ -259,9 +259,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tbsp"
     },
     {
-      "amount": "5/48",
+      "amount": "5/3",
       "name": "honey",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "2",
@@ -421,9 +421,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "11/16",
+      "amount": "11",
       "name": "coconut oil",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "1/4",
@@ -492,9 +492,14 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "5/24",
+      "amount": "19",
+      "name": "carrots",
+      "unit": ""
+    },
+    {
+      "amount": "10/3",
       "name": "garlic powder",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "10",
@@ -507,9 +512,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "1/24",
+      "amount": "2/3",
       "name": "lemon zest",
-      "unit": "cup"
+      "unit": "tbsp"
     },
     {
       "amount": "8",
@@ -542,9 +547,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tbsp"
     },
     {
-      "amount": "19",
-      "name": "carrots",
-      "unit": ""
+      "amount": "5/4",
+      "name": "basil",
+      "unit": "cup"
     },
     {
       "amount": "1",
@@ -592,9 +597,19 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
+      "amount": "17/4",
+      "name": "yellow onion",
+      "unit": ""
+    },
+    {
       "amount": "1/2",
       "name": "chilli red",
       "unit": "tsp"
+    },
+    {
+      "amount": "3/2",
+      "name": "cilantro",
+      "unit": "cup"
     },
     {
       "amount": "1/2",
@@ -617,11 +632,6 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "17/4",
-      "name": "yellow onion",
-      "unit": ""
-    },
-    {
       "amount": "1",
       "name": "red chili",
       "unit": ""
@@ -632,6 +642,11 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
+      "amount": "5",
+      "name": "lemon juice",
+      "unit": "tbsp"
+    },
+    {
       "amount": "9/4",
       "name": "lentils",
       "unit": "cup"
@@ -640,11 +655,6 @@ EXPECTED_GROCERY_LIST = {
       "amount": "1",
       "name": "white onion",
       "unit": ""
-    },
-    {
-      "amount": "5/4",
-      "name": "basil",
-      "unit": "cup"
     },
     {
       "amount": "10",
@@ -697,11 +707,6 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "3/2",
-      "name": "cilantro",
-      "unit": "cup"
-    },
-    {
       "amount": "700",
       "name": "baby potatoes",
       "unit": "g"
@@ -734,11 +739,6 @@ EXPECTED_GROCERY_LIST = {
     {
       "amount": "3/2",
       "name": "brown lentils",
-      "unit": "cup"
-    },
-    {
-      "amount": "5/16",
-      "name": "lemon juice",
       "unit": "cup"
     },
     {
