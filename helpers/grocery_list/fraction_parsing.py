@@ -35,7 +35,11 @@ def convert_unicode_fractions(string_to_convert):
     unicode_fraction = filter(lambda x: unicodedata.name(x).startswith(VF), unicode_string)
     if unicode_fraction:
         string_to_convert = unicode_string.replace(unicode_fraction, str(VULGAR_FRACTIONS[unicode_fraction]))
-    return str(string_to_convert)
+    try:
+        string_to_convert = str(string_to_convert)
+    except UnicodeEncodeError:
+        print string_to_convert
+    return string_to_convert
 
 
 def is_character_part_of_fraction(character, string):
