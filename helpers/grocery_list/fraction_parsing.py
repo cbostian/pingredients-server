@@ -38,7 +38,7 @@ def convert_unicode_fractions(string_to_convert):
     try:
         string_to_convert = str(string_to_convert)
     except UnicodeEncodeError:
-        print string_to_convert
+        string_to_convert = 'couldnt decode'
     return string_to_convert
 
 
