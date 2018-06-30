@@ -52,7 +52,7 @@ def transform_servings(pin):
         yields = str(yields)
     except:
         yields = 'couldnnt decode'
-    yields = float(''.join(filter(str.isdigit, servings.get('yields', ''))))
+    yields = float(''.join(filter(str.isdigit, yields)))
     yield_units = ''.join(filter(lambda x: str.isalpha(x) or str.isspace(x),
                                  servings.get('summary'))).replace('Makes', '').strip()
 
