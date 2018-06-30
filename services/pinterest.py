@@ -47,8 +47,12 @@ def transform_servings(pin):
             pin['metadata']['recipe']['servings'] = {'serves': float(servings.get('serves', ''))}
 
         return pin
-
-    yields = float(''.join(filter(str.isdigit, servings.get('yields'))))
+    yields = servings.get('yields', '')
+    try:
+        yields = str(yields)
+    except:
+        yields = 'couldnnt decode'
+    yields = float(''.join(filter(str.isdigit, servings.get('yields', ''))))
     yield_units = ''.join(filter(lambda x: str.isalpha(x) or str.isspace(x),
                                  servings.get('summary'))).replace('Makes', '').strip()
 
