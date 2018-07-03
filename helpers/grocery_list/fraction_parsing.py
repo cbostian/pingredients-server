@@ -1,7 +1,7 @@
 import unicodedata
 from fractions import Fraction
 
-from helpers.grocery_list.conjunction_parsing import is_conjunction_between_numbers
+from helpers.grocery_list.text_parsing import is_word_between_numbers
 
 VF = 'VULGAR FRACTION '
 VULGAR_FRACTIONS = {
@@ -43,7 +43,7 @@ def convert_unicode_fractions(string_to_convert):
 
 
 def is_character_part_of_fraction(character, string):
-    return (character.isdigit() or (character == '/' and is_conjunction_between_numbers('/', string))
+    return (character.isdigit() or (character == '/' and is_word_between_numbers('/', string))
             or character.isspace())
 
 
@@ -68,3 +68,4 @@ def set_display_amount(ingredient):
             closest_display_fraction = fraction
 
     ingredient['display_amount'] = str(amount - remainder + closest_display_fraction)
+

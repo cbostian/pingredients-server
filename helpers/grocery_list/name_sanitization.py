@@ -2,9 +2,10 @@ import re
 from copy import deepcopy
 from difflib import SequenceMatcher
 
-from constants.grocery_list import (IGNORED_CONJUNCTION_INGREDIENTS, IRRELEVANT_PHRASES, IRRELEVANT_WORDS,
-                                    INGREDIENT_COMMON_ADJECTIVES, INGREDIENT_SYNONYMS, PREFERRED_NAME_OVERRIDES,
-                                    ALL_DERIVED_UNITS)
+from constants.grocery_list import (ALL_DERIVED_UNITS, HOMONYM_UNITS, IGNORED_CONJUNCTION_INGREDIENTS,
+                                    IRRELEVANT_PHRASES, IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES,
+                                    INGREDIENT_SYNONYMS, MIN_SIMILARITY_TO_COMBINE, PARTIAL_SYNONYMS,
+                                    PREFERRED_NAME_OVERRIDES)
 
 
 def sanitize_name(names):
@@ -34,7 +35,8 @@ def remove_irrelevant_words(name):
 
 def get_all_irrelevant_words(name):
     irrelevant_words_in_context = []
-    irrelevant_words = filter(lambda irrelevant_word: len(irrelevant_word) > 1, IRRELEVANT_WORDS) + ALL_DERIVED_UNITS
+    irrelevant_words = (filter(lambda irrelevant_word: len(irrelevant_word) > 1, IRRELEVANT_WORDS) +
+                        [unit for unit in ALL_DERIVED_UNITS if unit not in HOMONYM_UNITS])
     for phrase in irrelevant_words:
         words = phrase.split()
         if not is_phrase_in_word(words, name):
@@ -92,14 +94,19 @@ def get_preferred_name(names):
             derived_to_preferred_names[preferred_name + ' ' + derived_name] = preferred_name_override
 
     best_name = names[0]
-    max_match = 0.7857142857142856
+    max_match = MIN_SIMILARITY_TO_COMBINE
 
     for name in names:
         for derived_name, preferred_name in derived_to_preferred_names.items():
-            match = SequenceMatcher(None, ''.join(sorted(name.lower().split())),
-                                    ''.join(sorted(derived_name.lower().split()))).ratio()
+            match = get_name_similarity(name, derived_name)
             if match > max_match:
                 best_name = preferred_name
                 max_match = match
+    for synonym, original in PARTIAL_SYNONYMS.items():
+        best_name = best_name.replace(synonym, original)
+
     return INGREDIENT_SYNONYMS.get(best_name, best_name)
 
+
+def get_name_similarity(name1, name2):
+    return SequenceMatcher(None, ''.join(sorted(name1.lower().split())), ''.join(sorted(name2.lower().split()))).ratio()

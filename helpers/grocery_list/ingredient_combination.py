@@ -1,8 +1,8 @@
 from copy import deepcopy
 from fractions import Fraction
 
-from constants.grocery_list import (UNITS, MINOR_TO_MAJOR_CONVERSIONS, MINOR_VOLUME_WEIGHT_CONVERSIONS,
-                                    MAJOR_VOLUME_WEIGHT_CONVERSIONS)
+from constants.grocery_list import (IGNORED_MINOR_TO_MAJOR, MINOR_TO_MAJOR_CONVERSIONS,
+                                    MINOR_VOLUME_WEIGHT_CONVERSIONS, MAJOR_VOLUME_WEIGHT_CONVERSIONS, UNITS)
 from helpers.grocery_list.fraction_parsing import set_display_amount
 
 
@@ -11,7 +11,7 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
                                      default_units.get(ingredient_to_compare['name'], ''))
     original_ingredient_to_compare = deepcopy(ingredient_to_compare)
     for ingredient in grocery_list.get(category, []):
-        if ingredient['name'] == ingredient_to_compare['name']:
+        if do_names_match(ingredient['name'], ingredient_to_compare['name']):
             converted = False
             if ingredient['unit'] != ingredient_to_compare['unit']:
                 original_unit = ingredient['unit']
@@ -111,6 +111,9 @@ def convert_units(ingredient, major_to_minor=True):
     if not conversion_scale.get(ingredient['unit'], {}).get('conversion'):
         return
 
+    if conversion_scale[ingredient['unit']]['conversion']['unit'] in IGNORED_MINOR_TO_MAJOR and not major_to_minor:
+        return
+
     converted_amount = Fraction(ingredient['amount']) * conversion_scale[ingredient['unit']]['conversion']['ratio']
     if (not major_to_minor and converted_amount.denominator > 8
             and converted_amount.denominator > converted_amount.numerator):
@@ -120,3 +123,16 @@ def convert_units(ingredient, major_to_minor=True):
     ingredient['unit'] = conversion_scale[ingredient['unit']]['conversion']['unit']
 
     convert_units(ingredient, major_to_minor)
+
+
+def do_names_match(name1, name2):
+    if name1[len(name1) - 1] != 's':
+        name1 += 's'
+
+    if name2[len(name2) - 1] != 's':
+        name2 += 's'
+
+    if name1 == name2:
+        return True
+
+    return False

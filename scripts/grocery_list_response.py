@@ -6,7 +6,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "193/16",
+      "amount": "89/8",
       "name": "salt",
       "unit": "tsp"
     },
@@ -157,7 +157,7 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "1/8",
-      "name": "nutmeg ground",
+      "name": "nutmeg",
       "unit": "tsp"
     },
     {
@@ -212,7 +212,7 @@ EXPECTED_GROCERY_LIST = {
   ],
   "Canned Goods": [
     {
-      "amount": "20",
+      "amount": "26",
       "name": "vegetable broth",
       "unit": "cup"
     },
@@ -228,7 +228,7 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "6",
-      "name": "red curry paste",
+      "name": "curry paste",
       "unit": "tbsp"
     },
     {
@@ -236,11 +236,6 @@ EXPECTED_GROCERY_LIST = {
       "name": "beef broth",
       "unit": "cup"
     },
-    {
-      "amount": "6",
-      "name": "broth low sodium",
-      "unit": "cup"
-    }
   ],
   "Condiments": [
     {
@@ -444,7 +439,7 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "4",
-      "name": "salmon fillets skinless",
+      "name": "salmon fillets",
       "unit": ""
     },
     {
@@ -456,7 +451,7 @@ EXPECTED_GROCERY_LIST = {
   "Pasta & Grains": [
     {
       "amount": "1",
-      "name": "quinoa",
+      "name": "rice",
       "unit": ""
     },
     {
@@ -638,7 +633,7 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "2/3",
-      "name": "corn whole kernel",
+      "name": "corn",
       "unit": "cup"
     },
     {
@@ -647,7 +642,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": "tbsp"
     },
     {
-      "amount": "9/4",
+      "amount": "15/4",
       "name": "lentils",
       "unit": "cup"
     },
@@ -692,7 +687,7 @@ EXPECTED_GROCERY_LIST = {
       "unit": ""
     },
     {
-      "amount": "29",
+      "amount": "30",
       "name": "chickpeas",
       "unit": "oz"
     },
@@ -737,18 +732,13 @@ EXPECTED_GROCERY_LIST = {
       "unit": "cup"
     },
     {
-      "amount": "3/2",
-      "name": "brown lentils",
-      "unit": "cup"
-    },
-    {
       "amount": "1",
       "name": "red bell pepper",
       "unit": ""
     },
     {
       "amount": "1",
-      "name": "sweet potatoes",
+      "name": "sweet potato",
       "unit": "lb"
     },
     {
