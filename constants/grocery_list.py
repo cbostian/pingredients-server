@@ -1,20 +1,24 @@
 from fractions import Fraction
 
-ADDITIVE_CONJUNCTIONS = ['and', '&']
+ADDITIVE_CONJUNCTIONS = ['and', '&', '+', 'plus']
 EXCLUSIVE_CONJUNCTIONS = ['or', '/']
 CONDITIONAL_CONJUNCTIONS = ['if']
 IGNORED_CONJUNCTION_INGREDIENTS = ['half']
+
+MIN_SIMILARITY_TO_COMBINE = 0.7857142857142856
 
 INGREDIENT_COMMON_ADJECTIVES = {
     'pepper': ['black', 'cracked'],
     'chili flake': ['red'],
     'flour': ['all purpose'],
-    'salt': ['kosher'],
+    'salt': ['kosher', 'table'],
     'oil': ['olive', 'cooking'],
     'parmesan cheese': ['grated'],
     'onion': ['yellow'],
     'broth': ['vegetable'],
     'paprika': ['smoked', 'ground'],
+    'turmeric': ['ground', 'powder'],
+    'nutmeg': ['ground', 'powder'],
     'cumin': ['ground', 'powder'],
     'egg': ['yolk', 'white'],
     'sugar': ['granulated', 'white'],
@@ -25,17 +29,32 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'cilantro': ['leaves'],
     'cinnamon': ['ground'],
     'chickpeas': ['canned'],
-    'lentils': ['red'],
+    'lentils': ['red', 'green', 'brown'],
     'maple': ['syrup'],
     'jalapeno': ['pepper'],
     'coconut oil': ['virigin'],
-    'olive oil': ['virigin']
+    'olive oil': ['virigin'],
+    'peas frozen': ['green'],
+    'brown sugar': ['dark'],
+    'curry powder': ['yellow'],
+    'curry paste': ['red'],
+    'cocoa powder': ['black'],
+    'vanilla': ['extract'],
+    'mexican shredded cheese': ['style'],
+    'sweet potato': ['purple'],
+    'cacao powder': ['dutch', 'dutch process'],
+    'thyme ground': ['dried']
 }
 
 INGREDIENT_SYNONYMS = {
     'coriander': 'cilantro',
     'confectioners sugar': 'powdered sugar',
-    'coriander ground': 'coriander powder'
+    'coriander ground': 'coriander powder',
+    'chicken': 'chicken breast'
+}
+
+PARTIAL_SYNONYMS = {
+    'stock': 'broth'
 }
 
 PREFERRED_NAME_OVERRIDES = {
@@ -45,7 +64,8 @@ PREFERRED_NAME_OVERRIDES = {
     'potato': 'russet potato',
     'cheese': 'cheddar cheese',
     'shredded cheese': 'shredded cheddar cheese',
-    'maple': 'maple syrup'
+    'maple': 'maple syrup',
+    'vanilla': 'vanilla extract'
 }
 
 IRRELEVANT_WORDS = [
@@ -54,7 +74,8 @@ IRRELEVANT_WORDS = [
     'small',
     'large',
     'medium',
-    'see notes',
+    'see',
+    'notes',
     'optional',
     'peeled',
     'cut',
@@ -63,10 +84,8 @@ IRRELEVANT_WORDS = [
     'super',
     'firm',
     'cooked',
-    '*',
     '(',
     ')',
-    '+',
     ',',
     'vegan',
     'reduced',
@@ -87,7 +106,6 @@ IRRELEVANT_WORDS = [
     'packed',
     'roasted',
     'thai',
-    '/',
     'flaky',
     'head',
     'thawed',
@@ -95,7 +113,35 @@ IRRELEVANT_WORDS = [
     'finely minced to',
     'hard',
     'soft',
-    'boil in bag'
+    'boil in bag',
+    'salted',
+    'raw',
+    'whole',
+    'kernel',
+    'refined',
+    'curly',
+    'stems',
+    'organic',
+    'light',
+    'low',
+    'sodium',
+    'unsweetened',
+    'boneless',
+    'skinless',
+    'filtered',
+    'squeezed',
+    'granulated',
+    'good quality',
+    'semi sweet',
+    'refrigerated',
+    'grass fed',
+    '"',
+    'regular',
+    'ripe',
+    'underripe',
+    'slightly',
+    'cooled',
+    'destemmed'
 ]
 
 IRRELEVANT_INGREDIENTS = [
@@ -103,21 +149,25 @@ IRRELEVANT_INGREDIENTS = [
     'water',
     'ice water',
     'topping',
-    ''
+    '',
 ]
 
 IRRELEVANT_PHRASES = [
-    'for the'
+    'for the',
+    'such as',
+    'to cook',
+    '*',
+    'cut into'
 ]
 
 UNITS = {
     'oz': {
         'synonyms': ['ounce'],
-        'conversion': {}
+        'conversion': {'unit': 'g', 'ratio': 28}
     },
     'lb': {
         'synonyms': [],
-        'conversion': {}
+        'conversion': {'unit': 'oz', 'ratio': 16}
     },
     'tsp': {
         'synonyms': ['teaspoon'],
@@ -126,6 +176,10 @@ UNITS = {
     'cup': {
         'synonyms': ['c'],
         'conversion': {'unit': 'tbsp', 'ratio': 16}
+    },
+    'pinch': {
+        'synonyms': [],
+        'conversion': {'unit': 'tsp', 'ratio': Fraction(1, 16)}
     },
     'dash': {
         'synonyms': [],
@@ -149,7 +203,7 @@ UNITS = {
     },
     'can': {
         'synonyms': [],
-        'conversion': {'unit': 'oz', 'ratio': 14}
+        'conversion': {}
     },
     'clove': {
         'synonyms': [],
@@ -162,14 +216,20 @@ UNITS = {
     'leaves': {
         'synonyms': [],
         'conversion': {}
+    },
+    'piece': {
+        'synonyms': [],
+        'conversion': {}
     }
 }
+
+HOMONYM_UNITS = ['clove', 'piece']
 
 ALL_DERIVED_UNITS = []
 for unit, unit_properties in UNITS.items():
     ALL_DERIVED_UNITS += [unit] + unit_properties['synonyms']
 
-IGNORED_MINOR_TO_MAJOR = ['dash', 'can']
+IGNORED_MINOR_TO_MAJOR = ['dash', 'can', 'pinch']
 
 MINOR_TO_MAJOR_CONVERSIONS = {}
 for unit, unit_properties in UNITS.items():
@@ -192,9 +252,24 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
             'conversion': {'unit': 'g', 'ratio': Fraction(10, 3)}
         },
     },
+    'sugar': {
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': 4}
+        },
+    },
     'coconut milk': {
         'oz': {
             'conversion': {'unit': 'cup', 'ratio': Fraction(1, 8)}
+        },
+        'can': {
+            'synonyms': [],
+            'conversion': {'unit': 'oz', 'ratio': 14}
+        },
+    },
+    'chickpeas': {
+        'can': {
+            'synonyms': [],
+            'conversion': {'unit': 'oz', 'ratio': 15}
         },
     },
     'kale': {
