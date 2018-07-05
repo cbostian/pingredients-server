@@ -123,4 +123,4 @@ def split_words_on_conjunction(contextual_conjunction, string):
 
 
 def get_contextual_conjunction(conjunction):
-    return (' ' if len(conjunction) > 1 else '') + conjunction
+    return ' ' + conjunction + ' ' if len(conjunction) > 1 else conjunction

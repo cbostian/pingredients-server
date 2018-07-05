@@ -604,7 +604,7 @@ EXPECTED_GROCERY_LIST = {
     {
       "amount": "3/2",
       "name": "cilantro",
-      "unit": "cup"
+      "unit": "bunch"
     },
     {
       "amount": "1/2",
