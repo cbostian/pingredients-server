@@ -220,6 +220,10 @@ UNITS = {
     'piece': {
         'synonyms': [],
         'conversion': {}
+    },
+    'package': {
+        'synonyms': [],
+        'conversion': {}
     }
 }
 
@@ -278,18 +282,46 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
         }
     },
     'cilantro': {
-        'cup': {
-            'conversion': {'unit': 'leaves', 'ratio': 1}
+        'bunch': {
+            'conversion': {'unit': 'tbsp', 'ratio': 16}
         },
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': 1}
+        },
+        'leaves': {
+            'conversion': {'unit': 'cup', 'ratio': 1}
+        }
     },
     'basil': {
         'cup': {
             'conversion': {'unit': '', 'ratio': 1}
+        },
+        '': {
+            'conversion': {'unit': 'tbsp', 'ratio': 16}
         }
     },
     'carrots': {
         '': {
             'conversion': {'unit': 'cup', 'ratio': Fraction(1, 3)}
+        },
+        'tbsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(39, 4)}
+        }
+    },
+    'russet potato': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': 1}
+        },
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(77, 10)}
+        }
+    },
+    'sweet potato': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': Fraction(2, 3)}
+        },
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(18, 5)}
         }
     },
     'yellow onion': {
@@ -310,6 +342,16 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
     'lemon zest': {
         'tsp': {
             'conversion': {'unit': '', 'ratio': Fraction(1, 3)}
+        }
+    },
+    'active dry yeast': {
+        'g': {
+            'conversion': {'unit': 'tsp', 'ratio': Fraction(5, 14)}
+        }
+    },
+    'dark chocolate chips': {
+        'g': {
+            'conversion': {'unit': 'tsp', 'ratio': Fraction(1, 3)}
         }
     }
 }
