@@ -43,7 +43,9 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'mexican shredded cheese': ['style'],
     'sweet potato': ['purple'],
     'cacao powder': ['dutch', 'dutch process'],
-    'thyme ground': ['dried']
+    'wheat flour': ['white'],
+    'ginger': ['root'],
+    'dates': ['medjool'],
 }
 
 INGREDIENT_SYNONYMS = {
@@ -54,7 +56,7 @@ INGREDIENT_SYNONYMS = {
 }
 
 PARTIAL_SYNONYMS = {
-    'stock': 'broth'
+    'stock': 'broth',
 }
 
 PREFERRED_NAME_OVERRIDES = {
@@ -141,7 +143,10 @@ IRRELEVANT_WORDS = [
     'underripe',
     'slightly',
     'cooled',
-    'destemmed'
+    'de stemmed',
+    'home made',
+    'pitted',
+    'inch'
 ]
 
 IRRELEVANT_INGREDIENTS = [
@@ -178,7 +183,7 @@ UNITS = {
         'conversion': {'unit': 'tbsp', 'ratio': 16}
     },
     'pinch': {
-        'synonyms': [],
+        'synonyms': ['pinches'],
         'conversion': {'unit': 'tsp', 'ratio': Fraction(1, 16)}
     },
     'dash': {
@@ -224,16 +229,24 @@ UNITS = {
     'package': {
         'synonyms': [],
         'conversion': {}
+    },
+    'bunch': {
+        'synonyms': [],
+        'conversion': {}
+    },
+    'pint': {
+        'synonyms': [],
+        'conversion': {'unit': 'cup', 'ratio': 2}
     }
 }
 
-HOMONYM_UNITS = ['clove', 'piece']
+HOMONYM_UNITS = ['clove', 'piece', 'can']
 
 ALL_DERIVED_UNITS = []
 for unit, unit_properties in UNITS.items():
     ALL_DERIVED_UNITS += [unit] + unit_properties['synonyms']
 
-IGNORED_MINOR_TO_MAJOR = ['dash', 'can', 'pinch']
+IGNORED_MINOR_TO_MAJOR = ['dash', 'can', 'pinch', 'pint']
 
 MINOR_TO_MAJOR_CONVERSIONS = {}
 for unit, unit_properties in UNITS.items():
@@ -266,13 +279,11 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
             'conversion': {'unit': 'cup', 'ratio': Fraction(1, 8)}
         },
         'can': {
-            'synonyms': [],
             'conversion': {'unit': 'oz', 'ratio': 14}
         },
     },
     'chickpeas': {
         'can': {
-            'synonyms': [],
             'conversion': {'unit': 'oz', 'ratio': 15}
         },
     },
@@ -308,6 +319,16 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
             'conversion': {'unit': 'g', 'ratio': Fraction(39, 4)}
         }
     },
+    'dates': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': Fraction(1, 8)}
+        }
+    },
+    'avocado': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': Fraction(5, 4)}
+        },
+    },
     'russet potato': {
         '': {
             'conversion': {'unit': 'cup', 'ratio': 1}
@@ -324,9 +345,12 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
             'conversion': {'unit': 'g', 'ratio': Fraction(18, 5)}
         }
     },
-    'yellow onion': {
+    'onion': {
         '': {
             'conversion': {'unit': 'cup', 'ratio': 1}
+        },
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(55, 24)}
         }
     },
     'garlic': {
@@ -355,6 +379,13 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
         }
     }
 }
+
+CONVERSION_SYNONYMS = {
+    'onion': ['yellow onion', 'white onion', 'red onion']
+}
+for ingredient, synonyms in CONVERSION_SYNONYMS.items():
+    for synonym in synonyms:
+        MAJOR_VOLUME_WEIGHT_CONVERSIONS.update({synonym: MAJOR_VOLUME_WEIGHT_CONVERSIONS[ingredient]})
 
 MINOR_VOLUME_WEIGHT_CONVERSIONS = {}
 for ingredient, conversions in MAJOR_VOLUME_WEIGHT_CONVERSIONS.items():

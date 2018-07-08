@@ -91,9 +91,17 @@ def get_default_units(grocery_list):
     for name, units in unit_occurrences.items():
         if len(units.keys()) > 1:
             max_unit = sorted(units.keys())[0]
+            max_occurrences = units[max_unit]
             for unit, occurrences in units.items():
                 if occurrences > units[max_unit]:
                     max_unit = unit
+                    max_occurrences = occurrences
+
+            if max_occurrences == 1 and max_unit == '':
+                for unit, occurrences in units.items():
+                    if occurrences > 1 and unit:
+                        max_unit = unit
+                        break
             default_units[name] = max_unit
     return default_units
 
@@ -106,7 +114,7 @@ def convert_units(ingredient, major_to_minor=True):
         conversion_scale = deepcopy(MINOR_TO_MAJOR_CONVERSIONS)
         weight_scale = MINOR_VOLUME_WEIGHT_CONVERSIONS
 
-    conversion_scale.update(weight_scale.get(ingredient['name'], {}))
+    conversion_scale.update(get_ingredient_scale(ingredient['name'], weight_scale))
 
     if not conversion_scale.get(ingredient['unit'], {}).get('conversion'):
         return
@@ -125,14 +133,33 @@ def convert_units(ingredient, major_to_minor=True):
     convert_units(ingredient, major_to_minor)
 
 
+def get_ingredient_scale(name, scale):
+    possible_names = get_pluralizations(name)
+
+    for possible_name in possible_names:
+        if scale.get(possible_name):
+            return scale.get(possible_name)
+
+    return {}
+
+
 def do_names_match(name1, name2):
-    if name1[len(name1) - 1] != 's':
-        name1 += 's'
+    names1 = get_pluralizations(' '.join(sorted(name1.split())))
+    names2 = get_pluralizations(' '.join(sorted(name2.split())))
 
-    if name2[len(name2) - 1] != 's':
-        name2 += 's'
-
-    if name1 == name2:
-        return True
+    for possible_name1 in names1:
+        for possible_name2 in names2:
+            if possible_name1 == possible_name2:
+                return True
 
     return False
+
+
+def get_pluralizations(name):
+    names = [name]
+    plural_endings = ['s', 'es', 'ed']
+
+    for plural_ending in plural_endings:
+        names.append(name + plural_ending)
+
+    return names

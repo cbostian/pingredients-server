@@ -13,7 +13,6 @@ def sanitize_name(names):
 
 
 def remove_irrelevant_words(name):
-    name = remove_irrelevant_phrases(name)
     name = filter(lambda char: not (char.isdigit() or char in IRRELEVANT_WORDS), name)
     irrelevant_words = get_all_irrelevant_words(name)
     while any(word in name for word in irrelevant_words) and irrelevant_words:
@@ -74,10 +73,12 @@ def is_word_irrelevant_in_context(word, preceding_char, succeeding_char):
 
 
 def is_adjacent_char_irrelevant(char):
-    return char.isspace() or char in IRRELEVANT_WORDS or not char
+    return char.isspace() or char in IRRELEVANT_WORDS or not char or char.isdigit()
 
 
 def remove_irrelevant_phrases(name):
+    if '(' in name and ')' in name:
+        name = name.replace(name[name.index('('):name.index(')') + 1], ' ')
     for phrase in IRRELEVANT_PHRASES:
         if phrase in name:
             name = name[:name.index(phrase)]
