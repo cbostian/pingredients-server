@@ -8,12 +8,14 @@ from helpers.grocery_list.text_parsing import is_word_between_numbers
 
 
 def split_conjunctions(ingredient):
-    ingredient['name'] = remove_conditional_conjunctions(ingredient['name'])
+    ingredient['name'] = remove_irrelevant_phrases(remove_conditional_conjunctions(ingredient['name'].lower()))
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
         contextual_conjunction = get_contextual_conjunction(conjunction)
-        if (contextual_conjunction not in ingredient['name'] or
-                is_word_between_numbers(conjunction, ingredient['name'])):
+        if contextual_conjunction not in ingredient['name']:
+            continue
+        if is_word_between_numbers(conjunction, ingredient['name']):
+            ingredient['name'] = ingredient['name'].replace(conjunction, ' ')
             continue
 
         words = split_words_on_conjunction(contextual_conjunction, ingredient['name'])
@@ -68,12 +70,9 @@ def split_additive_conjunctions(ingredient, words, conjunction):
     if ',' in left_name:
         _, primary_noun_index = get_closest_to_character(',', left_name, False, lambda char: char.isspace())
         right_name = left_name[primary_noun_index:left_name.index(',')] + ' ' + right_name
-    elif ',' in right_name:
+    elif ', ' in right_name:
         _, primary_noun_index = get_closest_to_character(', ', right_name, True, lambda char: char.isspace())
         left_name += ' ' + right_name[right_name.index(', ') + 2:primary_noun_index + 1]
-
-    left_name = remove_irrelevant_phrases(left_name)
-    right_name = remove_irrelevant_phrases(right_name)
 
     right_amount = 0
     if any(char.isdigit() for char in right_name):

@@ -55,9 +55,6 @@ def derive_unit(string_with_unit, amount):
         if str(amount) in word:
             amount_index = index
 
-    if amount_index == len(words) - 1:
-        return ''
-
     for word in words[amount_index:]:
         if words.index(word) > amount_index and any(char.isdigit() for char in word):
             return ''

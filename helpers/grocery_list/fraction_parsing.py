@@ -31,15 +31,10 @@ for denominator in range(7):
 
 
 def convert_unicode_fractions(string_to_convert):
-    unicode_string = string_to_convert.encode('ascii', 'ignore').decode('unicode-escape')
-    unicode_fraction = filter(lambda x: unicodedata.name(x).startswith(VF), unicode_string)
+    unicode_fraction = filter(lambda x: unicodedata.name(x).startswith(VF), string_to_convert)
     if unicode_fraction:
-        string_to_convert = unicode_string.replace(unicode_fraction, str(VULGAR_FRACTIONS[unicode_fraction]))
-    try:
-        string_to_convert = str(string_to_convert)
-    except UnicodeEncodeError:
-        string_to_convert = 'couldnt decode'
-    return string_to_convert
+        string_to_convert = string_to_convert.replace(unicode_fraction, str(VULGAR_FRACTIONS[unicode_fraction]))
+    return str(string_to_convert)
 
 
 def is_character_part_of_fraction(character, string):
@@ -48,11 +43,22 @@ def is_character_part_of_fraction(character, string):
 
 
 def convert_fractions(string_to_convert):
-    fraction = ''.join(filter(lambda x: is_character_part_of_fraction(x, string_to_convert), string_to_convert)).strip()
-    if not fraction or '/' not in string_to_convert:
-        return string_to_convert
-    transformed_fraction = str(sum(Fraction(num) for num in fraction.split()))
-    return convert_unicode_fractions(string_to_convert.replace(fraction, transformed_fraction))
+    string_to_convert = string_to_convert.encode('ascii', 'ignore').decode('unicode-escape')
+    fractions = []
+    temp_fraction = ''
+    for char in string_to_convert:
+        if is_character_part_of_fraction(char, string_to_convert):
+            temp_fraction += char
+        elif temp_fraction.strip():
+            if '/' in temp_fraction:
+                fractions.append(temp_fraction)
+            temp_fraction = ''
+
+    for fraction in fractions:
+        string_to_convert = string_to_convert.replace(fraction, ' ' +
+                                                      str(sum(Fraction(num.strip()) for num in fraction.split())) + ' ')
+
+    return convert_unicode_fractions(string_to_convert)
 
 
 def set_display_amount(ingredient):
