@@ -46,6 +46,7 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'wheat flour': ['white'],
     'ginger': ['root'],
     'dates': ['medjool'],
+    'chili powder': ['red']
 }
 
 INGREDIENT_SYNONYMS = {
@@ -319,6 +320,14 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
             'conversion': {'unit': 'g', 'ratio': Fraction(39, 4)}
         }
     },
+    'cauliflower': {
+        '': {
+            'conversion': {'unit': 'cup', 'ratio': 4}
+        },
+        'tsp': {
+            'conversion': {'unit': 'g', 'ratio': Fraction(29, 10)}
+        }
+    },
     'dates': {
         '': {
             'conversion': {'unit': 'cup', 'ratio': Fraction(1, 8)}
@@ -377,15 +386,37 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
         'g': {
             'conversion': {'unit': 'tsp', 'ratio': Fraction(1, 3)}
         }
+    },
+    'green onion': {
+        'bunch': {
+            'conversion': {'unit': '', 'ratio': 7}
+        }
     }
 }
 
 CONVERSION_SYNONYMS = {
     'onion': ['yellow onion', 'white onion', 'red onion']
 }
+PLURAL_ENDINGS = ['s', 'es', 'ed']
+
+
+def get_pluralizations(name):
+    names = [name]
+    plural_endings = ['s', 'es', 'ed']
+
+    for plural_ending in plural_endings:
+        names.append(name + plural_ending)
+
+    return names
+
+
 for ingredient, synonyms in CONVERSION_SYNONYMS.items():
     for synonym in synonyms:
         MAJOR_VOLUME_WEIGHT_CONVERSIONS.update({synonym: MAJOR_VOLUME_WEIGHT_CONVERSIONS[ingredient]})
+
+for ingredient, conversions in MAJOR_VOLUME_WEIGHT_CONVERSIONS.items():
+    for pluralization in get_pluralizations(ingredient):
+        MAJOR_VOLUME_WEIGHT_CONVERSIONS.update({pluralization: conversions})
 
 MINOR_VOLUME_WEIGHT_CONVERSIONS = {}
 for ingredient, conversions in MAJOR_VOLUME_WEIGHT_CONVERSIONS.items():

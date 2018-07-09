@@ -2,7 +2,7 @@ from copy import deepcopy
 from fractions import Fraction
 
 from constants.grocery_list import (IGNORED_MINOR_TO_MAJOR, MINOR_TO_MAJOR_CONVERSIONS,
-                                    MINOR_VOLUME_WEIGHT_CONVERSIONS, MAJOR_VOLUME_WEIGHT_CONVERSIONS, UNITS)
+                                    MINOR_VOLUME_WEIGHT_CONVERSIONS, MAJOR_VOLUME_WEIGHT_CONVERSIONS, UNITS, get_pluralizations)
 from helpers.grocery_list.fraction_parsing import set_display_amount
 
 
@@ -20,6 +20,10 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
                 convert_units(ingredient)
                 converted = (ingredient['unit'] != original_unit) or (ingredient_to_compare['unit']
                                                                       != original_compare_unit)
+
+            if 'green onion' in ingredient['name']:
+                print ingredient
+                print ingredient_to_compare
             if ingredient['unit'] == ingredient_to_compare['unit']:
                 ingredient['amount'] = str(Fraction(ingredient_to_compare['amount']) + Fraction(ingredient['amount']))
                 if converted:
@@ -97,9 +101,9 @@ def get_default_units(grocery_list):
                     max_unit = unit
                     max_occurrences = occurrences
 
-            if max_occurrences == 1 and max_unit == '':
+            if max_occurrences == 1 and not max_unit and len(units.keys()) > 2:
                 for unit, occurrences in units.items():
-                    if occurrences > 1 and unit:
+                    if unit:
                         max_unit = unit
                         break
             default_units[name] = max_unit
@@ -144,22 +148,11 @@ def get_ingredient_scale(name, scale):
 
 
 def do_names_match(name1, name2):
-    names1 = get_pluralizations(' '.join(sorted(name1.split())))
-    names2 = get_pluralizations(' '.join(sorted(name2.split())))
+    names1 = get_pluralizations(name1)
+    names2 = get_pluralizations(name2)
 
     for possible_name1 in names1:
         for possible_name2 in names2:
             if possible_name1 == possible_name2:
                 return True
-
     return False
-
-
-def get_pluralizations(name):
-    names = [name]
-    plural_endings = ['s', 'es', 'ed']
-
-    for plural_ending in plural_endings:
-        names.append(name + plural_ending)
-
-    return names

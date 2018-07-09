@@ -11,7 +11,7 @@ def split_conjunctions(ingredient):
     ingredient['name'] = remove_irrelevant_phrases(remove_conditional_conjunctions(ingredient['name'].lower()))
     ingredients = [ingredient]
     for conjunction in ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS:
-        contextual_conjunction = get_contextual_conjunction(conjunction)
+        contextual_conjunction = get_contextual_conjunction(conjunction, ingredient['name'])
         if contextual_conjunction not in ingredient['name']:
             continue
         if is_word_between_numbers(conjunction, ingredient['name']):
@@ -20,7 +20,7 @@ def split_conjunctions(ingredient):
 
         words = split_words_on_conjunction(contextual_conjunction, ingredient['name'])
         if conjunction in ADDITIVE_CONJUNCTIONS:
-            split_ingredient = split_additive_conjunctions(ingredient, words, conjunction)
+            split_ingredient = split_additive_conjunctions(ingredient, words, contextual_conjunction)
             if split_ingredient:
                 ingredients += split_conjunctions(split_ingredient)
         else:
@@ -29,7 +29,7 @@ def split_conjunctions(ingredient):
                     if word.isdigit() or word in UNITS.keys() or word == conjunction:
                         ingredient['name'] = ingredient['name'].replace(word, '')
             else:
-                ingredient['name'] = sanitize_name(split_exclusive_conjunctions(words, conjunction))
+                ingredient['name'] = sanitize_name(split_exclusive_conjunctions(words, contextual_conjunction))
                 split_conjunctions(ingredient)
 
     ingredient['name'] = sanitize_name([ingredient['name']])
@@ -42,8 +42,8 @@ def remove_conditional_conjunctions(name):
         if conditional_conjunction in name:
             conditional_index = name.index(conditional_conjunction)
             terminal_index = len(name)
-            for conjunction in filter(lambda c: len(c) > 1 , ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS):
-                contextual_conjunction = get_contextual_conjunction(conjunction)
+            for conjunction in filter(lambda c: len(c) > 1, ADDITIVE_CONJUNCTIONS + EXCLUSIVE_CONJUNCTIONS):
+                contextual_conjunction = get_contextual_conjunction(conjunction, name)
                 if contextual_conjunction in name[conditional_index:]:
                     conjunction_index = name.find(contextual_conjunction, conditional_index)
                     if 0 <= conjunction_index < terminal_index:
@@ -54,6 +54,7 @@ def remove_conditional_conjunctions(name):
 
 
 def split_exclusive_conjunctions(words, conjunction):
+    conjunction = conjunction.strip()
     left = sanitize_name([' '.join(words[:words.index(conjunction)])]).split()
     right = sanitize_name([' '.join(words[words.index(conjunction) + 1:])]).split()
     if len(left) > len(right):
@@ -65,6 +66,7 @@ def split_exclusive_conjunctions(words, conjunction):
 
 
 def split_additive_conjunctions(ingredient, words, conjunction):
+    conjunction = conjunction.strip()
     left_name = ' '.join(words[:words.index(conjunction)])
     right_name = ' '.join(words[words.index(conjunction) + 1:])
     if ',' in left_name:
@@ -121,5 +123,12 @@ def split_words_on_conjunction(contextual_conjunction, string):
     return string.replace(contextual_conjunction, ' ' + contextual_conjunction + ' ').split()
 
 
-def get_contextual_conjunction(conjunction):
-    return ' ' + conjunction + ' ' if len(conjunction) > 1 else conjunction
+def get_contextual_conjunction(conjunction, name):
+    if len(conjunction) == 1:
+        return conjunction
+
+    contextual_conjunction = ' ' + conjunction + ','
+    if contextual_conjunction in name:
+        return contextual_conjunction
+
+    return ' ' + conjunction + ' '
