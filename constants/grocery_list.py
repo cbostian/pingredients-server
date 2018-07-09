@@ -1,4 +1,5 @@
 from fractions import Fraction
+from helpers.grocery_list.text_parsing import get_pluralizations
 
 ADDITIVE_CONJUNCTIONS = ['and', '&', '+', 'plus']
 EXCLUSIVE_CONJUNCTIONS = ['or', '/']
@@ -397,18 +398,6 @@ MAJOR_VOLUME_WEIGHT_CONVERSIONS = {
 CONVERSION_SYNONYMS = {
     'onion': ['yellow onion', 'white onion', 'red onion']
 }
-PLURAL_ENDINGS = ['s', 'es', 'ed']
-
-
-def get_pluralizations(name):
-    names = [name]
-    plural_endings = ['s', 'es', 'ed']
-
-    for plural_ending in plural_endings:
-        names.append(name + plural_ending)
-
-    return names
-
 
 for ingredient, synonyms in CONVERSION_SYNONYMS.items():
     for synonym in synonyms:

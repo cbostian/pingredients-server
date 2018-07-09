@@ -2,8 +2,9 @@ from copy import deepcopy
 from fractions import Fraction
 
 from constants.grocery_list import (IGNORED_MINOR_TO_MAJOR, MINOR_TO_MAJOR_CONVERSIONS,
-                                    MINOR_VOLUME_WEIGHT_CONVERSIONS, MAJOR_VOLUME_WEIGHT_CONVERSIONS, UNITS, get_pluralizations)
+                                    MINOR_VOLUME_WEIGHT_CONVERSIONS, MAJOR_VOLUME_WEIGHT_CONVERSIONS, UNITS)
 from helpers.grocery_list.fraction_parsing import set_display_amount
+from helpers.grocery_list.text_parsing import get_pluralizations
 
 
 def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list, default_units):
