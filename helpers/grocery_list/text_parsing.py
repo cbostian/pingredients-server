@@ -15,3 +15,13 @@ def get_closest_to_character(character, string, incrementing, condition=lambda c
         closest = string[closest_index]
 
     return closest, closest_index
+
+
+def get_pluralizations(name):
+    names = [name]
+    plural_endings = ['s', 'es', 'ed']
+
+    for plural_ending in plural_endings:
+        names.append(name + plural_ending)
+
+    return names

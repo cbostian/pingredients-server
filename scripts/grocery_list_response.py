@@ -502,9 +502,9 @@ EXPECTED_GROCERY_LIST = {
       "unit": "leaves"
     },
     {
-      "amount": "3/4",
+      "amount": "11/4",
       "name": "red onion",
-      "unit": "cup"
+      "unit": ""
     },
     {
       "amount": "2/3",
@@ -710,11 +710,6 @@ EXPECTED_GROCERY_LIST = {
       "amount": "1",
       "name": "oregano dried",
       "unit": "tsp"
-    },
-    {
-      "amount": "2",
-      "name": "red onions",
-      "unit": ""
     },
     {
       "amount": "2",
