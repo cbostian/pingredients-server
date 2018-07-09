@@ -21,9 +21,6 @@ def add_ingredient_to_grocery_list(ingredient_to_compare, category, grocery_list
                 converted = (ingredient['unit'] != original_unit) or (ingredient_to_compare['unit']
                                                                       != original_compare_unit)
 
-            if 'green onion' in ingredient['name']:
-                print ingredient
-                print ingredient_to_compare
             if ingredient['unit'] == ingredient_to_compare['unit']:
                 ingredient['amount'] = str(Fraction(ingredient_to_compare['amount']) + Fraction(ingredient['amount']))
                 if converted:
