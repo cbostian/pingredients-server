@@ -89,6 +89,9 @@ def get_preferred_name(names):
     max_match = MIN_SIMILARITY_TO_COMBINE
 
     for name in names:
+        for synonym, original in PARTIAL_SYNONYMS.items():
+            name = name.replace(synonym, original)
+
         for derived_name, preferred_name in DERIVED_TO_PREFERRED_NAMES.items():
             if name == derived_name:
                 return preferred_name
@@ -96,10 +99,6 @@ def get_preferred_name(names):
             if match > max_match:
                 best_name = preferred_name
                 max_match = match
-
-    if best_name == names[0]:
-        for synonym, original in PARTIAL_SYNONYMS.items():
-            best_name = best_name.replace(synonym, original)
 
     return INGREDIENT_SYNONYMS.get(best_name, best_name)
 
