@@ -3,7 +3,7 @@ import requests
 
 from copy import deepcopy
 from fixtures.recipe_samples import RECIPE_SAMPLES
-from helpers.grocery_list.ingredient_transformations import transform_ingredients
+from helpers.grocery_list.ingredient_transformations import transform_ingredients_structure
 
 
 base_url = 'https://api.pinterest.com/v1'
@@ -69,7 +69,7 @@ def transform_making(pin, making_recipes):
 
 def transform(pin, making_recipes):
     transform_servings(pin)
-    transform_ingredients(pin)
+    transform_ingredients_structure(pin)
     transform_making(pin, making_recipes)
     return pin
 

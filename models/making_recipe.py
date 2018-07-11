@@ -15,11 +15,11 @@ class Servings(ndb.Model):
 
 class Recipe(ndb.Model):
     ingredients = ndb.JsonProperty()
+    name = ndb.StringProperty()
 
 
 class Article(ndb.Model):
     description = ndb.StringProperty()
-    name = ndb.StringProperty()
 
 
 class Metadata(ndb.Model):
@@ -67,10 +67,10 @@ class MakingRecipe(ndb.Model):
             metadata=Metadata(
                 article=Article(
                     description=recipe_dict.get('metadata', {}).get('article', {}).get('description', ''),
-                    name=recipe_dict.get('metadata', {}).get('article', {}).get('name', '')
                 ),
                 recipe=Recipe(
-                    ingredients=recipe_dict.get('metadata', {}).get('recipe', {}).get('ingredients', {})
+                    ingredients=recipe_dict.get('metadata', {}).get('recipe', {}).get('ingredients', {}),
+                    name=recipe_dict.get('metadata', {}).get('recipe', {}).get('name', '')
                 ),
                 servings=Servings(
                     serves=recipe_dict.get('metadata', {}).get('servings', {}).get('serves'),

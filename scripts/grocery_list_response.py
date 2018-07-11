@@ -713,7 +713,7 @@ EXPECTED_GROCERY_LIST = {
     },
     {
       "amount": "2",
-      "name": "thyme dried",
+      "name": "dried thyme",
       "unit": "tsp"
     },
     {

@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 
 from decorators.request import authorize
 from helpers.grocery_list.ingredient_combination import combine_ingredients
+from helpers.grocery_list.ingredient_transformations import transform_ingredients
 from models.making_recipe import MakingRecipe
 from models.user import User
 from services.pinterest import get_batch_of_recipes
@@ -41,7 +42,7 @@ def create_user(_, user_id):
 @authorize()
 def make_recipe(_, user_id):
     user = ndb.Key(User, user_id).get()
-    user.making_recipes.append(MakingRecipe.from_dict(request.get_json()))
+    user.making_recipes.append(MakingRecipe.from_dict(transform_ingredients(request.get_json())))
     user.put()
     return jsonify({})
 

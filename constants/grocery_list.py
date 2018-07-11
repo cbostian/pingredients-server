@@ -1,3 +1,4 @@
+from copy import deepcopy
 from fractions import Fraction
 from helpers.grocery_list.text_parsing import get_pluralizations
 
@@ -47,7 +48,8 @@ INGREDIENT_COMMON_ADJECTIVES = {
     'wheat flour': ['white'],
     'ginger': ['root'],
     'dates': ['medjool'],
-    'chili powder': ['red']
+    'chili powder': ['red'],
+    'dried thyme': ['ground']
 }
 
 INGREDIENT_SYNONYMS = {
@@ -71,6 +73,13 @@ PREFERRED_NAME_OVERRIDES = {
     'maple': 'maple syrup',
     'vanilla': 'vanilla extract'
 }
+
+DERIVED_TO_PREFERRED_NAMES = deepcopy(PREFERRED_NAME_OVERRIDES)
+for preferred_name, derived_names in INGREDIENT_COMMON_ADJECTIVES.items():
+    preferred_name_override = PREFERRED_NAME_OVERRIDES.get(preferred_name) or preferred_name
+    DERIVED_TO_PREFERRED_NAMES[preferred_name] = preferred_name_override
+    for derived_name in derived_names:
+        DERIVED_TO_PREFERRED_NAMES[preferred_name + ' ' + derived_name] = preferred_name_override
 
 IRRELEVANT_WORDS = [
     'fresh',
