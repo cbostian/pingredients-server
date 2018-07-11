@@ -5,8 +5,6 @@ from constants.grocery_list import (ALL_DERIVED_UNITS, DERIVED_TO_PREFERRED_NAME
                                     IGNORED_CONJUNCTION_INGREDIENTS, IRRELEVANT_PHRASES, IRRELEVANT_WORDS,
                                     INGREDIENT_SYNONYMS, MIN_SIMILARITY_TO_COMBINE, PARTIAL_SYNONYMS)
 
-irrelevant_words_time = preferred_name_time = 0
-
 
 def sanitize_name(names):
     return ' '.join(get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names])).split())
