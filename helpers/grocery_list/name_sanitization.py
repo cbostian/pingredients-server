@@ -4,28 +4,12 @@ from difflib import SequenceMatcher
 from constants.grocery_list import (ALL_DERIVED_UNITS, DERIVED_TO_PREFERRED_NAMES, HOMONYM_UNITS,
                                     IGNORED_CONJUNCTION_INGREDIENTS, IRRELEVANT_PHRASES, IRRELEVANT_WORDS,
                                     INGREDIENT_SYNONYMS, MIN_SIMILARITY_TO_COMBINE, PARTIAL_SYNONYMS)
-import time
 
 irrelevant_words_time = preferred_name_time = 0
 
 
 def sanitize_name(names):
-    global irrelevant_words_time, preferred_name_time
-    start = time.time()
-    x = map(remove_irrelevant_words, [name.lower() for name in names])
-    end = time.time()
-    irrelevant_words_time += (end - start)
-    start = time.time()
-    x = ' '.join(get_preferred_name(x).split())
-    end = time.time()
-    preferred_name_time += (end - start)
-    return x
-
-
-def print_name_times():
-    global irrelevant_words_time, preferred_name_time
-    print 'IRRELEVANT_WORDS TIME: ' + str(irrelevant_words_time)
-    print 'PREFERRED_NAME TIME: ' + str(preferred_name_time)
+    return ' '.join(get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names])).split())
 
 
 def remove_irrelevant_words(name):
