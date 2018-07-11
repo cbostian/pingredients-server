@@ -24,7 +24,7 @@ def split_conjunctions(ingredient):
             if split_ingredient:
                 ingredients += split_conjunctions(split_ingredient)
         else:
-            if is_conjunction_between_amount(conjunction, ingredient['name']):
+            if is_conjunction_between_amount(contextual_conjunction, ingredient['name']):
                 for word in words:
                     if word.isdigit() or word in UNITS.keys() or word == conjunction:
                         ingredient['name'] = ingredient['name'].replace(word, '')
@@ -116,7 +116,7 @@ def is_conjunction_between_amount(conjunction, string):
     conjunction_index = words.index(conjunction.strip())
 
     return (words[conjunction_index - 1].isdigit()
-            or words[conjunction_index + conjunction_index < len(words) - 1].isdigit())
+            or words[conjunction_index + (conjunction_index < (len(words) - 1))].isdigit())
 
 
 def split_words_on_conjunction(contextual_conjunction, string):

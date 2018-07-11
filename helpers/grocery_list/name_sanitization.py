@@ -1,15 +1,31 @@
 import re
-from copy import deepcopy
 from difflib import SequenceMatcher
 
-from constants.grocery_list import (ALL_DERIVED_UNITS, HOMONYM_UNITS, IGNORED_CONJUNCTION_INGREDIENTS,
-                                    IRRELEVANT_PHRASES, IRRELEVANT_WORDS, INGREDIENT_COMMON_ADJECTIVES,
-                                    INGREDIENT_SYNONYMS, MIN_SIMILARITY_TO_COMBINE, PARTIAL_SYNONYMS,
-                                    PREFERRED_NAME_OVERRIDES)
+from constants.grocery_list import (ALL_DERIVED_UNITS, DERIVED_TO_PREFERRED_NAMES, HOMONYM_UNITS,
+                                    IGNORED_CONJUNCTION_INGREDIENTS, IRRELEVANT_PHRASES, IRRELEVANT_WORDS,
+                                    INGREDIENT_SYNONYMS, MIN_SIMILARITY_TO_COMBINE, PARTIAL_SYNONYMS)
+import time
+
+irrelevant_words_time = preferred_name_time = 0
 
 
 def sanitize_name(names):
-    return ' '.join(get_preferred_name(map(remove_irrelevant_words, [name.lower() for name in names])).split())
+    global irrelevant_words_time, preferred_name_time
+    start = time.time()
+    x = map(remove_irrelevant_words, [name.lower() for name in names])
+    end = time.time()
+    irrelevant_words_time += (end - start)
+    start = time.time()
+    x = ' '.join(get_preferred_name(x).split())
+    end = time.time()
+    preferred_name_time += (end - start)
+    return x
+
+
+def print_name_times():
+    global irrelevant_words_time, preferred_name_time
+    print 'IRRELEVANT_WORDS TIME: ' + str(irrelevant_words_time)
+    print 'PREFERRED_NAME TIME: ' + str(preferred_name_time)
 
 
 def remove_irrelevant_words(name):
@@ -87,24 +103,21 @@ def remove_irrelevant_phrases(name):
 
 
 def get_preferred_name(names):
-    derived_to_preferred_names = deepcopy(PREFERRED_NAME_OVERRIDES)
-    for preferred_name, derived_names in INGREDIENT_COMMON_ADJECTIVES.items():
-        preferred_name_override = PREFERRED_NAME_OVERRIDES.get(preferred_name) or preferred_name
-        derived_to_preferred_names[preferred_name] = preferred_name_override
-        for derived_name in derived_names:
-            derived_to_preferred_names[preferred_name + ' ' + derived_name] = preferred_name_override
-
     best_name = names[0]
     max_match = MIN_SIMILARITY_TO_COMBINE
 
     for name in names:
-        for derived_name, preferred_name in derived_to_preferred_names.items():
+        for derived_name, preferred_name in DERIVED_TO_PREFERRED_NAMES.items():
+            if name == derived_name:
+                return preferred_name
             match = get_name_similarity(name, derived_name)
             if match > max_match:
                 best_name = preferred_name
                 max_match = match
-    for synonym, original in PARTIAL_SYNONYMS.items():
-        best_name = best_name.replace(synonym, original)
+
+    if best_name == names[0]:
+        for synonym, original in PARTIAL_SYNONYMS.items():
+            best_name = best_name.replace(synonym, original)
 
     return INGREDIENT_SYNONYMS.get(best_name, best_name)
 

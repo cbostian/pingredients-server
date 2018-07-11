@@ -4,7 +4,7 @@ from helpers.grocery_list.name_sanitization import get_adjacent_characters, is_w
 from helpers.grocery_list.number_parsing import prepare_for_amount_parsing, get_number_from_string
 
 
-def transform_ingredients(pin):
+def transform_ingredients_structure(pin):
     ingredients_dict = {}
     recipe = pin['metadata']['recipe']
 
@@ -14,13 +14,25 @@ def transform_ingredients(pin):
     for ingredients in recipe['ingredients']:
         for ingredient in ingredients.get('ingredients', []):
             ingredients_dict.setdefault(ingredients['category'], [])
+            ingredients_dict[ingredients['category']].append(ingredient)
+
+    recipe['ingredients'] = ingredients_dict
+    return pin
+
+
+def transform_ingredients(pin):
+    recipe = pin['metadata']['recipe']
+    new_ingredients = {}
+    for category, ingredients in recipe['ingredients'].items():
+        new_ingredients.setdefault(category, [])
+        for ingredient in ingredients:
             if ingredient['name'].lower() not in IRRELEVANT_INGREDIENTS:
                 transformed_ingredients = transform_ingredient(ingredient)
                 for transformed_ingredient in transformed_ingredients:
                     if transformed_ingredient['name'].lower() not in IRRELEVANT_INGREDIENTS:
-                        ingredients_dict[ingredients['category']].append(transformed_ingredient)
+                        new_ingredients[category].append(transformed_ingredient)
 
-    recipe['ingredients'] = ingredients_dict
+    recipe['ingredients'] = new_ingredients
     return pin
 
 
@@ -44,8 +56,8 @@ def transform_ingredient(ingredient):
     if transformed_unit in HOMONYM_UNITS:
         name = name.replace(transformed_unit + 's', ' ').replace(transformed_unit, ' ')
 
-    return split_conjunctions(dict(name=name.replace(transformed_amount, ' '),
-                                   amount=transformed_amount, unit=transformed_unit))
+    return split_conjunctions(dict(name=name.replace(transformed_amount, ' '), amount=transformed_amount,
+                                   unit=transformed_unit))
 
 
 def derive_unit(string_with_unit, amount):
